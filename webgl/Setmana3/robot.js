@@ -9,7 +9,7 @@ let renderer, scene, camera;
 let angulo = 0;
 const material = new THREE.MeshNormalMaterial({flatShadig:true, wireframe: false});
 let planta; //per a vista de planta
-const L = 5;
+const L = 50;
 
 //Accions
 init();
@@ -82,13 +82,13 @@ function render() {
 function setCameras (ar) {
     let camaraOrto;
     if (ar > 1) 
-        camaraOrto = new THREE.OrthographicCamera(-L*ar, L*ar, L, -L, -20, 230);
+        camaraOrto = new THREE.OrthographicCamera(-L*ar, L*ar, L, -L, -20, 300);
     else
-        camaraOrto = new THREE.OrthographicCamera(-L, L, L / ar, -L / ar, -20, 230);
+        camaraOrto = new THREE.OrthographicCamera(-L, L, L / ar, -L / ar, -20, 300);
 
     planta = camaraOrto.clone();
-    planta.position.set(0,230,0);
-    planta.lookAt(0,0,0);
+    planta.position.set(0,200,0);
+    planta.lookAt(new THREE.Vector3(0,0,0));
     planta.up = new THREE.Vector3(0,0,-1);
 }
 
