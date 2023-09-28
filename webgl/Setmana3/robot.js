@@ -9,7 +9,7 @@ let renderer, scene, camera;
 let angulo = 0;
 const material = new THREE.MeshNormalMaterial({flatShadig:true, wireframe: false});
 let planta; //per a vista de planta
-const L = 50;
+const L = 110;
 
 //Accions
 init();
@@ -67,28 +67,30 @@ function render() {
     requestAnimationFrame(render);
     //update();
     renderer.clear();
-    
-    let w = window.innerWidth / 2;
-    let h = window.innerHeight / 2;
 
-    renderer.setViewport(0,0,2*w,2*h);
+    //que ocupe tot l'espai disponible
+    renderer.setViewport(0,0,window.innerWidth,window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
     renderer.render(scene, camera);
 
+    //Per a que ocupe 1/4 de la pantalla me quede amb el mínim entre l'altura i l'amplada i ho dividisc entre 4
     const lado = Math.min(window.innerWidth, window.innerHeight) / 4;
-    renderer.setViewport(0,lado*3,lado, lado);
+    renderer.setViewport(0,window.innerHeight - lado,lado, lado);
     renderer.render(scene, planta);
 }
 
 function setCameras (ar) {
     let camaraOrto;
     if (ar > 1) 
-        camaraOrto = new THREE.OrthographicCamera(-L*ar, L*ar, L, -L, -20, 300);
+        camaraOrto = new THREE.OrthographicCamera(-L, L, L, -L, -20, 400);
     else
-        camaraOrto = new THREE.OrthographicCamera(-L, L, L / ar, -L / ar, -20, 300);
+        camaraOrto = new THREE.OrthographicCamera(-L, L, L, -L, -20, 400);
 
     planta = camaraOrto.clone();
     planta.position.set(0,200,0);
     planta.lookAt(new THREE.Vector3(0,0,0));
+    planta.rotateZ(Math.PI); //per a que es veja com en l'enunciat, mirant cap amunt
     planta.up = new THREE.Vector3(0,0,-1);
 }
 
@@ -101,15 +103,15 @@ function updateAspectRatio () {
     camera.aspect = ar;
     camera.updateProjectionMatrix();
     if (ar > 1) {
-        planta.left = -L * ar;
-        planta.right = L * ar;
+        planta.left = -L;
+        planta.right = L;
         planta.top = L;
         planta.bottom = -L;
     } else {
         planta.left = -L;
         planta.right = L;
-        planta.top = L / ar;
-        planta.bottom = -L / ar;
+        planta.top = L;
+        planta.bottom = -L;
     }
 
     planta.updateProjectionMatrix();
