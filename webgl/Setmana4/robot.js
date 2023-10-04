@@ -1,11 +1,14 @@
 import * as THREE from "../lib/three.module.js";
 import { OrbitControls } from "../lib/OrbitControls.module.js";
 import crearRobotSuelo from "../js/RobotCreator.js";
+import { TWEEN } from "../lib/tween.module.min.js";
+import { GUI } from "../lib/lil-gui.module.min.js";
 
 //Variables estandard
 let renderer, scene, camera;
 
 //Otras globales
+let effectController;
 let angulo = 0;
 const material = new THREE.MeshNormalMaterial({
   flatShadig: true,
@@ -17,6 +20,7 @@ const L = 110;
 //Accions
 init();
 loadScene();
+setupGUI();
 render();
 
 function init() {
@@ -51,6 +55,75 @@ function init() {
   setCameras(ar);
   //Captura d'esdeveniments
   window.addEventListener("resize", updateAspectRatio);
+  //afegir listener per a quan es prema alguna tecla
+  window.addEventListener("keydown", onKeyDown);
+}
+
+function onKeyDown(event) {
+  //vull moure el robot segons la fletxa que s'haja premut
+  const tecla = event.keyCode;
+  const robot = scene.getObjectByName("robot");
+  switch (tecla) {
+    case 37: //esquerra
+      robot.position.x -= 1;
+      break;
+    case 38: //amunt
+      robot.position.z -= 1;
+      break;
+    case 39: //dreta
+      robot.position.x += 1;
+      break;
+    case 40: //abaix
+      robot.position.z += 1;
+      break;
+  }
+}
+
+function setupGUI() {
+  // Definicion de los controles
+  effectController = {
+    mensaje: "Controls Robot",
+    gir_base: 0.0,
+    gir_braç: 0.0,
+    gir_avantbraçY: 0.0,
+    gir_avantbraçZ: 0.0,
+    gir_pinça: 0.0,
+    separacio_pinça: 0.0,
+    alambre: false,
+    animar: performAnimation,
+  };
+
+  // Creacion interfaz
+  const gui = new GUI();
+
+  // Construccion del menu´
+  const h = gui.addFolder("Control robot");
+  h.add(effectController, "gir_base", -180.0, 180.0, 0.025)
+    .name("Gir base")
+    .onChange((value) => girarBase(value));
+  h.add(effectController, "gir_braç", -45.0, 45.0, 0.025)
+    .name("Gir braç")
+    .onChange((value) => girarBraç(value));
+  h.add(effectController, "gir_avantbraçY", -180.0, 180.0, 0.025)
+    .name("Gir avantbraç Y")
+    .onChange((value) => girarAvantbraçY(value));
+  h.add(effectController, "gir_avantbraçZ", -90.0, 90.0, 0.025)
+    .name("Gir avantbraç Z")
+    .onChange((value) => girarAvantbraçZ(value));
+  h.add(effectController, "gir_pinça", -40.0, 220.0, 0.025)
+    .name("Gir pinça")
+    .onChange((value) => girarPinça(value));
+  h.add(effectController, "separacio_pinça", 0.0, 15.0, 0.025)
+    .name("Separació pinça")
+    .onChange((value) => separarPinça(value));
+  //Checkbox alambric vs solid
+  h.add(effectController, "alambre")
+    .name("Alámbrico")
+    .onChange((value) => {
+      material.wireframe = value;
+    });
+  //Ara vull que animar siga un botó
+  h.add(effectController, "animar").name("Animar");
 }
 
 //Funció per carregar totes les geometries de l'escena
@@ -121,3 +194,12 @@ function updateAspectRatio() {
 
   planta.updateProjectionMatrix();
 }
+
+function girarBase(angle) {
+  angle = (angle * Math.PI) / 180; //ho passem a radians
+  const base = scene.getObjectByName("base");
+  base.rotation.y += angle;
+}
+
+///Funció per a animar el robot
+function performAnimation() {}
