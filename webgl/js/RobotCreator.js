@@ -19,10 +19,10 @@ function crearRobotSuelo(materialPiso, materialRobot) {
   const robot = new THREE.Object3D();
   robot.name = "robot";
   //Després li afegim la jerarquia a través de cridades i cadascuna ja construeix la seua pròpia jerarquia
-  const base_robot = crear_base_robot(materialRobot);
-  robot.add(base_robot);
   const brazo_robot = crear_brazo(materialRobot);
-  robot.add(brazo_robot);
+  const base_robot = crear_base_robot(materialRobot);
+  base_robot.add(brazo_robot);
+  robot.add(base_robot);
   //Es redueixen les mesures perquè puga cabre en tota la pantalla
   // robot.scale.set(0.035, 0.035, 0.035);
   root.add(robot);
@@ -215,7 +215,9 @@ function crear_ma(material, altura = 80) {
   const mans = new THREE.Object3D();
   mans.name = "mans";
   const ma_esquerra = crear_ganxo(material);
+  ma_esquerra.name = "ma_esquerra";
   const ma_dreta = crear_ganxo(material);
+  ma_dreta.name = "ma_dreta";
   //per tal de posar ambdues mans a la mateixa distància del centre posem una en 11 i l'altra en -11
   //i com el cilindre de la monyica té 40 d'altura, dons cadascu ha d'estar a 10 unitats del centre i del final
   //però li posem 11 perquè coincidisca amb els nervis
