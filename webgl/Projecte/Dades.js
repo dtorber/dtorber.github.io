@@ -17,7 +17,7 @@ const nom_planetes = [
 
 //Distancies de cada planeta al sol (en unitats astronòmiques: la Terra té distància 1)
 const distancies = {
-  // Sol: 0,
+  Sol: 0,
   Mercuri: 0.39,
   Venus: 0.72,
   Terra: 1,
@@ -30,7 +30,7 @@ const distancies = {
 
 //Proporció de radis de cada planeta en funció de la Terra, com les distàncies al sol
 const radis = {
-  // Sol: 109.08 / 2,
+  Sol: 109.08 / 2,
   Mercuri: 0.38,
   Venus: 0.95,
   Terra: 1.0,
@@ -44,7 +44,7 @@ const radis = {
 //Velocitats de rotacions dels planetes, en funció de la terra novament, així tots tindran un determinat ritme i bastarà multiplicar
 //per la velocitat a la que volem que vaja la Terra, i després per fer lo de accelerar les rotacions sera mes facil
 let velocitatsRotacio = {
-  // Sol: 0,
+  Sol: 0,
   Mercuri: 0.006880559085133418,
   Venus: 0.004142312579415501,
   Terra: 1,
