@@ -26,7 +26,7 @@ function crearRobotSuelo(materialPiso, materialRobot) {
   //Es redueixen les mesures perquè puga cabre en tota la pantalla
   // robot.scale.set(0.035, 0.035, 0.035);
   root.add(robot);
-
+  robot.add(new THREE.AxesHelper(200));
   return root;
 }
 
@@ -134,6 +134,8 @@ function crear_antebrazo(material, altura = 80) {
   ante_brazo.add(monyica);
   const mano = crear_ma(material, altura + 10); //li sumem 10 perquè és la meitat de l'altura de la mà
   ante_brazo.add(mano);
+  ante_brazo.rotation.y = Math.PI / 2;
+  ante_brazo.add(new THREE.AxesHelper(200));
   // ante_brazo.position.z = - 120;
   return ante_brazo;
 }
@@ -225,7 +227,7 @@ function crear_ma(material, altura = 80) {
   mans.add(ma_dreta);
   mans.rotation.y = -Math.PI / 2;
   //volem que la mà estiga a la mateixa alçada que la monyica i coincidisca el centre (-10 perquè és la meitat de l'altura de la mà i 15 el radi de la monyica)
-  mans.position.y = altura - 25;
+  mans.position.y = altura - 20;
   //després les repartim perquè es queden equidistants del centre i els extrems
   ma_esquerra.position.z = 11;
   ma_dreta.position.z = -11;

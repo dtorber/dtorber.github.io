@@ -8,7 +8,7 @@ import { GUI } from "../lib/lil-gui.module.min.js";
 let renderer, scene, camera;
 
 //Otras globales
-let effectController;
+let effectController, gui, menu; //per a la interfície gràfica
 let angulo = 0;
 const material = new THREE.MeshNormalMaterial({
   flatShadig: true,
@@ -94,36 +94,43 @@ function setupGUI() {
   };
 
   // Creacion interfaz
-  const gui = new GUI();
+  gui = new GUI();
 
   // Construccion del menu´
-  const h = gui.addFolder("Control robot");
-  h.add(effectController, "gir_base", -180.0, 180.0, 0.025)
+  menu = gui.addFolder("Control robot");
+  menu
+    .add(effectController, "gir_base", -180.0, 180.0, 0.025)
     .name("Gir base")
     .onChange((value) => girarBase(value));
-  h.add(effectController, "gir_braç", -45.0, 45.0, 0.025)
+  menu
+    .add(effectController, "gir_braç", -45.0, 45.0, 0.025)
     .name("Gir braç")
     .onChange((value) => girarBraç(value));
-  h.add(effectController, "gir_avantbraçY", -180.0, 180.0, 0.025)
+  menu
+    .add(effectController, "gir_avantbraçY", -180.0, 180.0, 0.025)
     .name("Gir avantbraç Y")
     .onChange((value) => girarAvantbraçY(value));
-  h.add(effectController, "gir_avantbraçZ", -90.0, 90.0, 0.025)
+  menu
+    .add(effectController, "gir_avantbraçZ", -90.0, 90.0, 0.025)
     .name("Gir avantbraç Z")
     .onChange((value) => girarAvantbraçZ(value));
-  h.add(effectController, "gir_pinça", -40.0, 220.0, 0.025)
+  menu
+    .add(effectController, "gir_pinça", -40.0, 220.0, 0.025)
     .name("Gir pinça")
     .onChange((value) => girarPinça(value));
-  h.add(effectController, "separacio_pinça", 0.0, 15.0, 0.025)
+  menu
+    .add(effectController, "separacio_pinça", 0.0, 15.0, 0.025)
     .name("Separació pinça")
     .onChange((value) => separarPinça(value));
   //Checkbox alambric vs solid
-  h.add(effectController, "alambre")
+  menu
+    .add(effectController, "alambre")
     .name("Alámbrico")
     .onChange((value) => {
       material.wireframe = value;
     });
   //Ara vull que animar siga un botó
-  h.add(effectController, "animar").name("Animar");
+  menu.add(effectController, "animar").name("Animar");
 }
 
 //Funció per carregar totes les geometries de l'escena
@@ -132,7 +139,7 @@ function loadScene() {
   scene.add(robot);
 
   //Crear els eixos de coordenades
-  scene.add(new THREE.AxesHelper(3));
+  scene.add(new THREE.AxesHelper(10));
 }
 
 //Funció per donar animació
@@ -140,6 +147,7 @@ function update() {
   //Donem animació al robot perquè vaja girant i així poder veure-ho tot
   // angulo += 0.01;
   // scene.rotation.y = angulo;
+  TWEEN.update();
 }
 
 //Funció render, sense el render no es veuria res, qualsevol modificació que es faça a l'escena s'ha de cridar a render després
@@ -168,7 +176,7 @@ function setCameras(ar) {
   planta = camaraOrto.clone();
   planta.position.set(0, 200, 0);
   planta.lookAt(new THREE.Vector3(0, 0, 0));
-  planta.rotateZ(Math.PI); //per a que es veja com en l'enunciat, mirant cap amunt
+  planta.rotateZ(-Math.PI / 2); //per a que es veja com en l'enunciat, mirant cap amunt
   planta.up = new THREE.Vector3(0, 0, -1);
 }
 
@@ -198,8 +206,186 @@ function updateAspectRatio() {
 function girarBase(angle) {
   angle = (angle * Math.PI) / 180; //ho passem a radians
   const base = scene.getObjectByName("base");
-  base.rotation.y += angle;
+  base.rotation.y = angle;
+}
+
+function girarBraç(angle) {
+  angle = (angle * Math.PI) / 180; //ho passem a radians
+  const braç = scene.getObjectByName("brazo");
+  braç.rotation.z = angle;
+}
+
+function girarAvantbraçY(angle) {
+  angle = (angle * Math.PI) / 180; //ho passem a radians
+  const avantbraç = scene.getObjectByName("antebrazo");
+  avantbraç.rotation.y = angle;
+}
+
+function girarAvantbraçZ(angle) {
+  angle = (angle * Math.PI) / 180; //ho passem a radians
+  const avantbraç = scene.getObjectByName("antebrazo");
+  // const desfer_rotacio_y = new THREE.Matrix4().makeRotationY(-Math.PI / 2);
+  // avantbraç.applyMatrix4(desfer_rotacio_y);
+  // const aplicar_rotacio_z = new THREE.Matrix4().makeRotationX(angle);
+  // avantbraç.applyMatrix4(aplicar_rotacio_z);
+  // const tornar_rotacio_y = new THREE.Matrix4().makeRotationY(Math.PI / 2);
+  // avantbraç.applyMatrix4(tornar_rotacio_y);
+  avantbraç.rotation.z = angle;
+}
+
+function girarPinça(angle) {
+  angle = (angle * Math.PI) / 180; //ho passem a radians
+  const pinça = scene.getObjectByName("mans");
+  pinça.rotation.z = angle;
+}
+
+function separarPinça(separacio) {
+  const ma_esq = scene.getObjectByName("ma_esquerra");
+  const ma_dreta = scene.getObjectByName("ma_dreta");
+  ma_esq.position.z = -separacio / 2;
+  ma_dreta.position.z = separacio / 2;
 }
 
 ///Funció per a animar el robot
-function performAnimation() {}
+function performAnimation() {
+  //s'haurà de fer l'animació amb TWEEN de manera que cadascun dels moviments vaja a una velocitat
+  //així es configura una animació.
+  //Fer-ho en intervals que ens interesse per exemple perquè no es veja la pinça mirant cap avall
+  //Per a això deuríem no de cridar a les funcions directament, si no fer un change dels elements del gui
+  const animate = (t) => {
+    TWEEN.update(t);
+    window.requestAnimationFrame(animate);
+  };
+  animate();
+  animacioBase();
+  animacioBrazo();
+  animacioAvantbraçZ();
+  animacioPinça();
+  animacioPinçaSeparacio();
+}
+
+function animacioBase() {
+  const inici = 0,
+    fi = -(2 * Math.PI) / 3;
+  const tween = new TWEEN.Tween({ y: inici })
+    .to({ y: fi }, 6000)
+    .easing(TWEEN.Easing.Elastic.InOut)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      menu.controllers[0].setValue((coords.y * 180) / Math.PI);
+    });
+  tween.start();
+
+  const tween2 = new TWEEN.Tween({ y: fi })
+    .to({ y: inici }, 6000)
+    .delay(6000)
+    .easing(TWEEN.Easing.Elastic.InOut)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      menu.controllers[0].setValue((coords.y * 180) / Math.PI);
+    });
+  tween2.start();
+}
+
+function animacioBrazo() {
+  const inici = 0,
+    fi = Math.PI / 4;
+
+  const tween = new TWEEN.Tween({ z: inici })
+    .to({ z: fi }, 4000)
+    .easing(TWEEN.Easing.Quadratic.InOut)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      menu.controllers[1].setValue((coords.z * 180) / Math.PI);
+    });
+  tween.start();
+
+  const tween2 = new TWEEN.Tween({ z: fi })
+    .to({ z: inici }, 4000)
+    .delay(4000)
+    .easing(TWEEN.Easing.Quadratic.InOut)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      menu.controllers[1].setValue((coords.z * 180) / Math.PI);
+    });
+  tween2.start();
+}
+
+function animacioAvantbraçZ() {
+  const iniciY = 0,
+    fiY = Math.PI / 4;
+  const iniciZ = 0,
+    fiZ = Math.PI / 4;
+
+  menu.controllers[2].setValue(0); //actualitzem el valor a 0 però realment són 180 graus
+  const antebrazo = scene.getObjectByName("antebrazo");
+  antebrazo.rotation.y = Math.PI / 2;
+
+  const tween = new TWEEN.Tween({ z: iniciZ })
+    .to({ z: fiZ }, 4000)
+    .easing(TWEEN.Easing.Sinusoidal.InOut)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      // menu.controllers[2].setValue((coords.y * 180) / Math.PI);
+      menu.controllers[3].setValue((coords.z * 180) / Math.PI);
+    });
+  tween.start();
+
+  const tween2 = new TWEEN.Tween({ z: fiZ })
+    .to({ z: iniciZ }, 4000)
+    .delay(4000)
+    .easing(TWEEN.Easing.Sinusoidal.InOut)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      // menu.controllers[2].setValue((coords.y * 180) / Math.PI);
+      menu.controllers[3].setValue((coords.z * 180) / Math.PI);
+    });
+  tween2.start();
+}
+
+function animacioPinça() {
+  const inici = 0,
+    fi = Math.PI / 4;
+  const tween = new TWEEN.Tween({ z: inici })
+    .to({ z: fi }, 3000)
+    .easing(TWEEN.Easing.Quartic.Out)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      menu.controllers[4].setValue((coords.z * 180) / Math.PI);
+    });
+  tween.start();
+
+  const tween2 = new TWEEN.Tween({ z: fi })
+    .to({ z: inici }, 4000)
+    .delay(3000)
+    .easing(TWEEN.Easing.Quartic.Out)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      menu.controllers[4].setValue((coords.z * 180) / Math.PI);
+    });
+  tween2.start();
+}
+
+function animacioPinçaSeparacio() {
+  const inici = 15,
+    fi = 0;
+
+  const tween = new TWEEN.Tween({ z: inici })
+    .to({ fi: 0 }, 3000)
+    .easing(TWEEN.Easing.Cubic.In)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      menu.controllers[5].setValue(coords.z);
+    });
+  tween.start();
+
+  const tween2 = new TWEEN.Tween({ z: fi })
+    .to({ z: inici }, 4000)
+    .delay(3000)
+    .easing(TWEEN.Easing.Cubic.In)
+    .interpolation(TWEEN.Interpolation.Linear)
+    .onUpdate((coords) => {
+      menu.controllers[5].setValue(coords.z);
+    });
+  tween2.start();
+}

@@ -95,7 +95,7 @@ function setCameras(ar) {
   planta = camaraOrto.clone();
   planta.position.set(0, 200, 0);
   planta.lookAt(new THREE.Vector3(0, 0, 0));
-  planta.rotateZ(Math.PI); //per a que es veja com en l'enunciat, mirant cap amunt
+  planta.rotateZ(- Math.PI / 2); //per a que es veja com en l'enunciat, mirant cap amunt
   planta.up = new THREE.Vector3(0, 0, -1);
 }
 
