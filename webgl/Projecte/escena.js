@@ -8,6 +8,10 @@ import GrafEscena from "./GrafEscena.js";
 //Variables estandar
 let renderer, scene, camera;
 
+const material = new THREE.MeshBasicMaterial({
+  color: 0x0000ff,
+  wireframe: true,
+});
 function init() {
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -27,7 +31,7 @@ function init() {
     75,
     window.innerWidth / window.innerHeight,
     1,
-    100
+    1000
   );
   camera.position.set(0.5, 2, 7);
   camera.lookAt(0, 1, 0);
@@ -53,8 +57,17 @@ function updateAspectRatio() {
   camera.updateProjectionMatrix();
 }
 
+function crearSuelo() {
+  const suelo_geometria = new THREE.PlaneGeometry(1000, 1000, 100, 100);
+  suelo_geometria.name = "suelo";
+  const suelo = new THREE.Mesh(suelo_geometria, material); //es 1000x1000 de tamany i gasta 100 meridians i 100 paral·lels
+  suelo.rotation.x = -Math.PI / 2;
+  return suelo;
+}
+
 function loadScene() {
   scene.add(GrafEscena.getEscena());
+  scene.add(crearSuelo());
 }
 
 //Funció que carrega el fons estrellat

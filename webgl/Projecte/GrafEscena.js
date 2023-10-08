@@ -14,13 +14,16 @@ export default class GrafEscena {
       const posX = distancies[nom_planeta]; //com volem col·locar-los tots en l'origen i desplaçats la seua distància només cal fer això
       const planeta = new Planeta(
         nom_planeta,
-        radi * 0.01,
+        radi,
         velocitatRotacio,
-        posX,
+        posX * 10,
         0,
         0
       );
-      root.add(planeta.getMesh());
+      const objecte = new THREE.Object3D();
+      objecte.add(planeta.getMesh());
+      objecte.name = nom_planeta;
+      root.add(objecte);
     }
     return root;
   }
