@@ -30,21 +30,28 @@ export default class Planeta {
     //si no està calculat el creem
     if (!this.mesh) {
       const geometria = new THREE.SphereGeometry(this.radi, 30, 30);
-      let textura;
       //en cas que no li hagem passat cap ruta de textura, creem una de normal
-      // if (this.rutaTextura)
-      //   textura = new THREE.TextureLoader().load(this.rutaTextura);
-      // else
-      //   textura = new THREE.MeshNormalMaterial({
-      //     flatShadig: true,
-      //     wireframe: false,
-      //   });
-      const material = new THREE.MeshNormalMaterial({
-        flatShading: true,
-        wireframe: false,
-      });
+      let material;
+      if (this.rutaTextura) {
+        const textura = new THREE.TextureLoader().load(this.rutaTextura);
+        textura.wrapS = THREE.RepeatWrapping;
+        textura.wrapT = THREE.RepeatWrapping;
+        material = new THREE.MeshBasicMaterial({
+          map: textura,
+          wireframe: false,
+        });
+      } else {
+        material = new THREE.MeshNormalMaterial({
+          flatShadig: true,
+          wireframe: false,
+        });
+      }
       this.mesh = new THREE.Mesh(geometria, material);
       this.mesh.position.set(this.posX, this.posY, this.posZ);
+      if (this.nom === "Sol") {
+        this.mesh.rotateX(Math.PI);
+        this.mesh.rotateZ(Math.PI / 2);
+      }
     }
     return this.mesh;
   }
