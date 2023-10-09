@@ -17,6 +17,7 @@ export default class GrafEscena {
     return new Promise((resolve, reject) => {
       //Crearem una arrel i d'ella penjara tot el que vaja en l'escena
       const root = new THREE.Object3D();
+      const loader = new THREE.TextureLoader();
       for (let nom_planeta of nom_planetes) {
         let radi = radis[nom_planeta];
         const velocitatRotacio = velocitatsRotacio[nom_planeta];
@@ -34,7 +35,7 @@ export default class GrafEscena {
           textures[nom_planeta]
         );
         const objecte = new THREE.Object3D();
-        objecte.add(planeta.getMesh());
+        objecte.add(planeta.getMesh(loader));
         objecte.name = nom_planeta;
         //Ací li haurem d'afegir algo de text i l'òrbita
         const curve = new THREE.EllipseCurve(

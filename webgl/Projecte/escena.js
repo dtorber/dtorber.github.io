@@ -1,17 +1,6 @@
 import * as THREE from "../lib/three.module.js";
-import { GLTFLoader } from "../lib/GLTFLoader.module.js";
 import { OrbitControls } from "../lib/OrbitControls.module.js";
-import {
-  nom_planetes,
-  distancies,
-  radis,
-  velocitatsRotacio,
-  tempsTraslacio,
-  VELOCITAT_ROTACIO_TERRA,
-  RADI_TERRA,
-  DISTANCIA_TERRA_SOL,
-} from "./Dades.js";
-import Planeta from "./Planeta.js";
+import { nom_planetes, tempsTraslacio } from "./Dades.js";
 import GrafEscena from "./GrafEscena.js";
 import Stats from "../lib/stats.module.js";
 import { TWEEN } from "../lib/tween.module.min.js";
@@ -27,6 +16,7 @@ let renderer,
   menu,
   effectController;
 let isMuted = false;
+const musica = false; //flag per a desactivar la musica durant el desenvolupament
 const animacioRotacioPlanetes = {};
 
 const material = new THREE.MeshBasicMaterial({
@@ -39,7 +29,6 @@ function init() {
   crearCamera();
   crearControls();
   crearFPS();
-  // afegirMusica();
   //Per a que les càmeres es redimensionen amb la finestra
   const ar = window.innerWidth / window.innerHeight;
   //Captura d'esdeveniments
@@ -82,16 +71,20 @@ function crearControls() {
 }
 
 function afegirMusica() {
-  const listener = new THREE.AudioListener();
-  camera.add(listener);
+  return new Promise((resolve, reject) => {
+    const listener = new THREE.AudioListener();
+    camera.add(listener);
 
-  const audioLoader = new THREE.AudioLoader();
-  backgroundSound = new THREE.Audio(listener);
-  audioLoader.load("../sounds/interstellar.mp3", function (buffer) {
-    backgroundSound.setBuffer(buffer);
-    backgroundSound.setLoop(true);
-    backgroundSound.setVolume(0.25);
-    backgroundSound.play();
+    const audioLoader = new THREE.AudioLoader();
+    backgroundSound = new THREE.Audio(listener);
+    audioLoader.load("../sounds/interstellar.mp3", function (buffer) {
+      backgroundSound.setBuffer(buffer);
+      backgroundSound.setLoop(true);
+      backgroundSound.setVolume(0.25);
+      backgroundSound.play();
+      //resolem la promesa una vegada s'ha carregat la música
+      resolve();
+    });
   });
 }
 
@@ -135,8 +128,15 @@ function loadScene() {
   scene.add(crearSuelo());
   GrafEscena.getEscena().then((escena) => {
     scene.add(escena);
-    render();
-    aplicarRotacions();
+    if (musica) {
+      afegirMusica().then(() => {
+        render();
+        aplicarRotacions();
+      });
+    } else {
+      render();
+      aplicarRotacions();
+    }
   });
   loadBackground();
 }
