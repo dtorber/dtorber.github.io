@@ -230,7 +230,9 @@ function girarAvantbraçZ(angle) {
   // avantbraç.applyMatrix4(aplicar_rotacio_z);
   // const tornar_rotacio_y = new THREE.Matrix4().makeRotationY(Math.PI / 2);
   // avantbraç.applyMatrix4(tornar_rotacio_y);
-  avantbraç.rotation.z = angle;
+  console.log(avantbraç.rotation);
+  avantbraç.rotation.x = angle;
+  console.log(avantbraç.rotation);
 }
 
 function girarPinça(angle) {
