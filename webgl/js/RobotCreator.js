@@ -132,9 +132,6 @@ function crear_antebrazo(material, altura = 80) {
   ante_brazo.add(nervis);
   const monyica = crear_monyica(material, altura);
   ante_brazo.add(monyica);
-  const mano = crear_ma(material, altura + 10); //li sumem 10 perquè és la meitat de l'altura de la mà
-  ante_brazo.add(mano);
-  ante_brazo.rotation.y = Math.PI / 2;
   ante_brazo.add(new THREE.AxesHelper(200));
   // ante_brazo.position.z = - 120;
   return ante_brazo;
@@ -209,6 +206,9 @@ function crear_monyica(material, altura = 80) {
   monyica.position.y = altura;
   monyica.rotation.z = Math.PI / 2;
   root.add(monyica);
+  const mano = crear_ma(material, altura + 10); //li sumem 10 perquè és la meitat de l'altura de la mà
+  root.add(mano);
+  root.rotation.y = Math.PI / 2;
   return root;
 }
 

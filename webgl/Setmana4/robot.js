@@ -140,6 +140,7 @@ function loadScene() {
 
   //Crear els eixos de coordenades
   scene.add(new THREE.AxesHelper(10));
+  console.log(scene);
 }
 
 //Funció per donar animació
@@ -231,7 +232,7 @@ function girarAvantbraçZ(angle) {
   // const tornar_rotacio_y = new THREE.Matrix4().makeRotationY(Math.PI / 2);
   // avantbraç.applyMatrix4(tornar_rotacio_y);
   console.log(avantbraç.rotation);
-  avantbraç.rotation.x = angle;
+  avantbraç.rotation.z = angle;
   console.log(avantbraç.rotation);
 }
 
