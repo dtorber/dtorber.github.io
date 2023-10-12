@@ -24,16 +24,23 @@ export default class Planeta {
     this.rutaTextura = rutaTextura;
     this.mesh = null;
     this.info = infoPlaneta;
+    this.llunes = [];
   }
 
-  getMesh(loader) {
+  getMesh(loader, outline) {
     //si no està calculat el creem
     if (!this.mesh) {
       const geometria = new THREE.SphereGeometry(this.radi, 30, 30);
       //en cas que no li hagem passat cap ruta de textura, creem una de normal
       let material;
       if (this.rutaTextura) {
-        const textura = loader.load(this.rutaTextura);
+        const textura = loader.load(this.rutaTextura, function (texture) {
+          if (texture) {
+            outline.patternTexture = texture;
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+          }
+        });
         textura.wrapS = THREE.RepeatWrapping;
         textura.wrapT = THREE.RepeatWrapping;
         material = new THREE.MeshBasicMaterial({
@@ -54,6 +61,10 @@ export default class Planeta {
       }
     }
     return this.mesh;
+  }
+
+  afegirLluna(lluna) {
+    this.llunes.push(lluna);
   }
 
   // getMesh(loader) {

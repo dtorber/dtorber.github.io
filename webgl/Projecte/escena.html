@@ -16,7 +16,12 @@
     ></script>
     <!-- Declaracion del espacio de nombres three -->
     <script type="importmap">
-      { "imports": { "three": "../lib/three.module.js" } }
+      {
+        "imports": {
+          "three": "../lib/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.157.0/examples/"
+        }
+      }
     </script>
 
     <!-- Sustituir por el el script propio -->

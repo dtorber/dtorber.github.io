@@ -40,6 +40,7 @@ const distancies = {
   Saturn: 9.54,
   Urà: 19.2,
   Neptú: 30.06,
+  Lluna: 15, //distancia de la lluna a la terra
 };
 
 //Proporció de radis de cada planeta en funció de la Terra, com les distàncies al sol
@@ -64,6 +65,7 @@ const radis = {
   Saturn: 9.45 * 4,
   Urà: 4.01 * 4,
   Neptú: 3.88 * 4,
+  Lluna: 0.33 * 16, //es un terç de la terra
 };
 
 const radisOffset = {
@@ -105,6 +107,10 @@ const tempsTraslacio = {
   Neptú: ((164 * 365 + 298) * 24 * 3600 * 1000) / 100000,
 };
 
+const tempsRotacioLlunes = {
+  Lluna: (27.32 * 24 * 3600 * 1000) / 10000,
+};
+
 const textures = {
   Sol: "../textures/sun_texture.jpg",
   Mercuri: "../textures/mercury_texture.jpg",
@@ -115,6 +121,7 @@ const textures = {
   Saturn: "../textures/saturn_texture.jpg",
   Urà: "../textures/uranus_texture.jpg",
   Neptú: "../textures/neptune_texture.jpg",
+  Lluna: "../textures/moon_texture.jpg",
 };
 
 const colorsOrbites = {
@@ -137,6 +144,7 @@ export {
   textures,
   colorsOrbites,
   tempsTraslacio,
+  tempsRotacioLlunes,
   VELOCITAT_ROTACIO_TERRA,
   DISTANCIA_TERRA_SOL,
   RADI_TERRA,

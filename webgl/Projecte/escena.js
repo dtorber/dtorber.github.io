@@ -1,6 +1,11 @@
 import * as THREE from "../lib/three.module.js";
 import { OrbitControls } from "../lib/OrbitControls.module.js";
-import { nom_planetes, tempsTraslacio } from "./Dades.js";
+import {
+  nom_planetes,
+  tempsTraslacio,
+  tempsRotacioLlunes,
+  distancies,
+} from "./Dades.js";
 import GrafEscena from "./GrafEscena.js";
 import Stats from "../lib/stats.module.js";
 import { TWEEN } from "../lib/tween.module.min.js";
@@ -17,7 +22,11 @@ let renderer,
   effectController;
 let isMuted = false;
 const musica = false; //flag per a desactivar la musica durant el desenvolupament
-const animacioRotacioPlanetes = {};
+const animacioTraslacioPlanetes = {};
+const animacioRotacioLlunes = {};
+let planetes;
+const mouse = new THREE.Vector2();
+const rayo = new THREE.Raycaster();
 
 const material = new THREE.MeshBasicMaterial({
   color: 0x0000ff,
@@ -36,6 +45,8 @@ function init() {
   document.getElementById("mute-unmute-music").addEventListener("click", () => {
     muteMusica();
   });
+  document.addEventListener("mousemove", updateMousePosition);
+  renderer.domElement.addEventListener("dblclick", listenerClick);
 }
 
 function crearFPS() {
@@ -67,7 +78,7 @@ function crearControls() {
   //Per a poder moure la càmera amb el ratolí
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.minDistance = 1;
-  controls.maxDistance = 1000000;
+  controls.maxDistance = 19000;
 }
 
 function afegirMusica() {
@@ -126,16 +137,18 @@ function crearSuelo() {
 
 function loadScene() {
   scene.add(crearSuelo());
-  GrafEscena.getEscena().then((escena) => {
+  GrafEscena.getEscena().then((resposta) => {
+    const escena = resposta["escena"];
+    planetes = resposta["planetes"];
     scene.add(escena);
     if (musica) {
       afegirMusica().then(() => {
         render();
-        aplicarRotacions();
+        aplicarMovimentsPlanetes();
       });
     } else {
       render();
-      aplicarRotacions();
+      aplicarMovimentsPlanetes();
     }
   });
   loadBackground();
@@ -145,30 +158,48 @@ function loadScene() {
 //ENCARA NO FUNCIONA, ESPERAR A LA 3a PRÀCTICA
 function loadBackground() {
   const loader = new THREE.TextureLoader();
-  const texturaFons = loader.load("../textures/fons_estrellat2.jpg");
-  scene.background = texturaFons;
+  const geometriaFons = new THREE.SphereGeometry(20000, 100, 100);
+  const materialFons = new THREE.MeshBasicMaterial({
+    map: loader.load("../textures/fons_estrellat3.jpg"),
+    side: THREE.DoubleSide, //la textura es mostra en ambdós costats
+  });
+  const fons = new THREE.Mesh(geometriaFons, materialFons);
+  scene.add(fons);
 }
 
-function update() {
-  angulo += 0.01;
-  scene.rotation.y = angulo;
+function update() {}
+
+function listenerClick(event) {
+  let x = (event.clientX / window.innerWidth) * 2 - 1;
+  let y = -(event.clientY / window.innerHeight) * 2 + 1;
+  const rayo = new THREE.Raycaster();
+  rayo.setFromCamera(new THREE.Vector2(x, y), camera);
+  for (let nom_planeta of nom_planetes) {
+    const objecte = scene.getObjectByName(nom_planeta);
+    const interseccion = rayo.intersectObjects(objecte.children, false);
+    if (interseccion.length > 0) objecte.scale.set(1.2, 1.2, 1.2);
+    else objecte.scale.set(1, 1, 1);
+  }
 }
 
 function render() {
   requestAnimationFrame(render);
-  //update();
+  // update();
   renderer.clear();
   renderer.render(scene, camera);
   //Actualitzem les estadístiques dels FPS
   stats.update();
 }
 
-///Funció per a fer les rotacions
-function aplicarRotacions() {
-  //s'haurà de fer l'animació amb TWEEN de manera que cadascun dels moviments vaja a una velocitat
-  //així es configura una animació.
-  //Fer-ho en intervals que ens interesse per exemple perquè no es veja la pinça mirant cap avall
-  //Per a això deuríem no de cridar a les funcions directament, si no fer un change dels elements del gui
+//Funció llançadera per fer tots els moviments dels planetes
+function aplicarMovimentsPlanetes() {
+  aplicarTraslacions();
+  // aplicarRotacionsLlunes();
+  // aplicarRotacionsPlanetes();
+}
+
+///Funció per a fer les traslacions dels planetes al voltant del sol
+function aplicarTraslacions() {
   const animate = (t) => {
     TWEEN.update(t);
     window.requestAnimationFrame(animate);
@@ -178,15 +209,6 @@ function aplicarRotacions() {
   for (let nom_planeta of nom_planetes) {
     if (nom_planeta === "Sol") continue; //el sol no rota
     const planeta = scene.getObjectByName(nom_planeta);
-    // const velocitatRotacio = velocitatsRotacio[nom_planeta];
-    // //velocitatsRotacio estan en funció de la velocitat de la terra, per tant multipliquem per la seua velocitat real
-    // const velocitatReal = velocitatRotacio * VELOCITAT_ROTACIO_TERRA;
-    // //i ara cal que calculem la distància que ha de recórrer que és el diàmetre de l'orbita que descriu, com la distància al sol
-    // // està en funció de la de la terra, cal que multipliquem per la distància de la terra
-    // const tempsRotacioCompleta =
-    //   (2 * Math.PI * distancies[nom_planeta] * DISTANCIA_TERRA_SOL) /
-    //   velocitatReal; //2 * PI * distancia_real / velocitat dona el temps de descriure una órbita completa
-    // console.log(nom_planeta + ":" + tempsRotacioCompleta);
     const rotacio = new TWEEN.Tween({ y: 0 })
       .to({ y: Math.PI * 2 }, tempsTraslacio[nom_planeta])
       .repeat(Infinity)
@@ -195,13 +217,64 @@ function aplicarRotacions() {
         planeta.setRotationFromAxisAngle(new THREE.Vector3(0, 1, 0), coords.y);
       })
       .start();
-    animacioRotacioPlanetes[nom_planeta] = rotacio;
+    animacioTraslacioPlanetes[nom_planeta] = rotacio;
+    //Este codi és per fer la traslació de les llunes perquè acompanyen al planeta en cas qeu no siga un fill de la jerarquia
+    // for (let lluna of planetes[nom_planeta].llunes) {
+    //   const llunaObjecte = scene.getObjectByName(lluna.nom);
+    //   const rotacioLluna = new TWEEN.Tween({ y: 0 })
+    //     .to({ y: Math.PI * 2 }, tempsTraslacio[nom_planeta])
+    //     .repeat(Infinity)
+    //     .onUpdate((coords) => {
+    //       // menu.controllers[2].setValue((coords.y * 180) / Math.PI);
+    //       llunaObjecte.setRotationFromAxisAngle(
+    //         new THREE.Vector3(0, 1, 0),
+    //         coords.y
+    //       );
+    //     })
+    //     .start();
+    //   animacioTraslacioPlanetes[lluna.nom] = rotacioLluna;
+    // }
   }
 }
 
-function modificarVelocitatRotacio(nom_planeta, factorReduccio) {
-  animacioRotacioPlanetes[nom_planeta].duration(
+//Funció per a fer les rotacions de les llunes al voltant dels planetes
+function aplicarRotacionsLlunes() {
+  for (let planeta of Object.values(planetes)) {
+    for (let lluna of planeta.llunes) {
+      const objecteLluna = scene.getObjectByName(lluna.nom);
+      const rotacio = new TWEEN.Tween({ y: 0 })
+        .to({ y: Math.PI * 2 }, 10000)
+        .repeat(Infinity)
+        .onUpdate((coords) => {
+          // menu.controllers[2].setValue((coords.y * 180) / Math.PI);
+          objecteLluna.position.x = Math.cos(coords.y) * lluna.posX;
+          objecteLluna.position.z = Math.sin(coords.y) * lluna.posX;
+        })
+        .start();
+      animacioRotacioLlunes[lluna.nom] = rotacio;
+    }
+  }
+}
+
+//Funció per a fer les rotacions dels planetes sobre ells mateixos
+function aplicarRotacionsPlanetes() {}
+
+function modificarVelocitatTraslacio(nom_planeta, factorReduccio) {
+  animacioTraslacioPlanetes[nom_planeta].duration(
     tempsTraslacio[nom_planeta] / factorReduccio
+  );
+  //les llunes han d'anar traslladant-se al voltant del sol igual que el seu planeta
+  //este codi es en cas que no afegim les llunes com a filles del planeta en la jerarquia
+  // for (let lluna of planetes[nom_planeta].llunes) {
+  //   animacioTraslacioPlanetes[lluna.nom].duration(
+  //     tempsTraslacio[nom_planeta] / factorReduccio
+  //   );
+  // }
+}
+
+function modificarVelocitatRotacioLluna(nom_lluna, factorReduccio) {
+  animacioTraslacioPlanetes[nom_lluna].duration(
+    tempsRotacioLlunes[nom_lluna] / factorReduccio
   );
 }
 
@@ -227,9 +300,19 @@ function setupGUI() {
       for (let nom_planeta of nom_planetes) {
         if (nom_planeta === "Sol") continue; //el sol no rota
         //encara que siga 0, no passa res perquè no es fa res, serà infinit i aleshores anirà massa lent i punt
-        modificarVelocitatRotacio(nom_planeta, factor_reduccio);
+        modificarVelocitatTraslacio(nom_planeta, factor_reduccio);
+        // for (let lluna of planetes[nom_planeta].llunes) {
+        //   modificarVelocitatRotacioLluna(lluna.nom, factor_reduccio);
+        // }
       }
     });
+}
+
+function updateMousePosition(event) {
+  // Convierte las coordenadas del mouse a un sistema de coordenadas entre -1 y 1
+  event.preventDefault();
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
 //Accions
