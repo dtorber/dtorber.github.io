@@ -18,7 +18,8 @@ let renderer,
   stats,
   backgroundSound,
   gui,
-  menu,
+  menu_velocidad,
+  menu_info,
   effectController;
 let isMuted = false;
 const musica = false; //flag per a desactivar la musica durant el desenvolupament
@@ -28,6 +29,7 @@ let planetes;
 const mouse = new THREE.Vector2();
 const rayo = new THREE.Raycaster();
 
+let ultimPlanetaVisible;
 const material = new THREE.MeshBasicMaterial({
   color: 0x0000ff,
   wireframe: true,
@@ -46,7 +48,7 @@ function init() {
     muteMusica();
   });
   document.addEventListener("mousemove", updateMousePosition);
-  renderer.domElement.addEventListener("dblclick", listenerClick);
+  renderer.domElement.addEventListener("click", listenerClick);
 }
 
 function crearFPS() {
@@ -169,19 +171,6 @@ function loadBackground() {
 
 function update() {}
 
-function listenerClick(event) {
-  let x = (event.clientX / window.innerWidth) * 2 - 1;
-  let y = -(event.clientY / window.innerHeight) * 2 + 1;
-  const rayo = new THREE.Raycaster();
-  rayo.setFromCamera(new THREE.Vector2(x, y), camera);
-  for (let nom_planeta of nom_planetes) {
-    const objecte = scene.getObjectByName(nom_planeta);
-    const interseccion = rayo.intersectObjects(objecte.children, false);
-    if (interseccion.length > 0) objecte.scale.set(1.2, 1.2, 1.2);
-    else objecte.scale.set(1, 1, 1);
-  }
-}
-
 function render() {
   requestAnimationFrame(render);
   // update();
@@ -281,8 +270,16 @@ function modificarVelocitatRotacioLluna(nom_lluna, factorReduccio) {
 function setupGUI() {
   // Definicion de los controles
   effectController = {
-    mensaje: "Controles de la aplicación",
     velocidad: 1,
+    showInfoSol: showInfo("Sol"),
+    showInfoMercuri: showInfo("Mercuri"),
+    showInfoVenus: showInfo("Venus"),
+    showInfoTerra: showInfo("Terra"),
+    showInfoMarte: showInfo("Marte"),
+    showInfoJupiter: showInfo("Jupiter"),
+    showInfoSaturn: showInfo("Saturn"),
+    showInfoUrano: showInfo("Urà"),
+    showInfoNeptu: showInfo("Neptú"),
   };
 
   // Creacion interfaz
@@ -291,9 +288,8 @@ function setupGUI() {
   gui.domElement.style.right = "2px"; // Cambia la distancia desde la derecha
   gui.domElement.style.top = "50px"; // Cambia la distancia desde la parte superior
   // Construccion del menu´
-  menu = gui.addFolder("Control velocidades");
-  menu.add(effectController, "mensaje").name("Aplicacion");
-  menu
+  menu_velocidad = gui.addFolder("Control velocidades");
+  menu_velocidad
     .add(effectController, "velocidad", 0, 1000, 0.1)
     .name("Factor de velocidad")
     .onChange((factor_reduccio) => {
@@ -306,13 +302,89 @@ function setupGUI() {
         // }
       }
     });
+
+  menu_info = gui.addFolder("Mostrar información");
+  menu_info.add(effectController, "showInfoSol").name("Sol");
+  menu_info.add(effectController, "showInfoMercuri").name("Mercurio");
+  menu_info.add(effectController, "showInfoVenus").name("Venus");
+  menu_info.add(effectController, "showInfoTerra").name("Tierra");
+  menu_info.add(effectController, "showInfoMarte").name("Marte");
+  menu_info.add(effectController, "showInfoJupiter").name("Jupiter");
+  menu_info.add(effectController, "showInfoSaturn").name("Saturno");
+  menu_info.add(effectController, "showInfoUrano").name("Urano");
+  menu_info.add(effectController, "showInfoNeptu").name("Neptuno");
 }
 
+//Funció per capturar la posició del mouse per poder aplicar més endavant el Hover
 function updateMousePosition(event) {
   // Convierte las coordenadas del mouse a un sistema de coordenadas entre -1 y 1
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+  rayo.setFromCamera(mouse, camera);
+
+  for (let nom_planeta of nom_planetes) {
+    const objecte = scene.getObjectByName(nom_planeta);
+    const interseccion = rayo.intersectObjects(objecte.children, false);
+    if (interseccion.length > 0) {
+      document.body.style.cursor = "pointer";
+      //NO FUNCIONA AMB LINEWIDTH, S'HAN DE CREAR SHADERS!!!!!
+      //busque de tots els fills del planeta en la jerarquia el que siga la línia i incremente el seu gruix
+      // for (let children of objecte.children) {
+      //   if (children.type === "Line") {
+      //     children.material = new THREE.LineBasicMaterial({
+      //       color: children.material.color,
+      //       linewidth: 40,
+      //     });
+      //     console.log(children);
+      //     break;
+      //   }
+      // }
+      break;
+    } else {
+      document.body.style.cursor = "default";
+      // for (let children of objecte.children) {
+      //   if (children.type === "Line") {
+      //     children.material.linewidth = 1;
+      //   }
+      // }
+    }
+  }
+}
+
+//Funció per a la gestió del click sobre un planeta que mostrarà informació sobre ell
+function listenerClick(event) {
+  let x = (event.clientX / window.innerWidth) * 2 - 1;
+  let y = -(event.clientY / window.innerHeight) * 2 + 1;
+  rayo.setFromCamera(new THREE.Vector2(x, y), camera);
+  let hiHaInterseccio = false;
+  for (let nom_planeta of nom_planetes) {
+    const objecte = scene.getObjectByName(nom_planeta);
+    const interseccion = rayo.intersectObjects(objecte.children, false);
+    if (interseccion.length > 0) {
+      showInfo(nom_planeta)();
+      hiHaInterseccio = true;
+      break;
+    }
+  }
+  //si no hi ha cap intersecció, aleshores hem d'amagar el div de la informació del planeta
+  if (!hiHaInterseccio) {
+    if (ultimPlanetaVisible !== undefined)
+      document.getElementById(ultimPlanetaVisible).style.display = "none";
+    document.getElementById("info").style.display = "none";
+  }
+}
+
+//funció per amagar tota la informació menys la del planeta que volem mostrar
+function showInfo(nom_planeta) {
+  return () => {
+    if (ultimPlanetaVisible !== undefined)
+      document.getElementById(ultimPlanetaVisible).style.display = "none";
+    document.getElementById("info").style.display = "block";
+    document.getElementById(nom_planeta).style.display = "block";
+    ultimPlanetaVisible = nom_planeta;
+  };
 }
 
 //Accions

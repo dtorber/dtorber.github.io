@@ -35,11 +35,15 @@
       }
       #info {
         position: absolute;
-        bottom: 0px;
+        top: 30px;
         left: 50px;
-        width: 30%;
         text-align: left;
+        color: white;
+        background-color: green;
+        width: 30%;
+        height: 80%;
         z-index: 1;
+        margin: 0;
       }
       i {
         position: absolute;
@@ -50,6 +54,57 @@
         color: #fff;
         cursor: pointer;
       }
+      /* Apply styles to all iframes within the div */
+      div iframe {
+        margin: 10px 0;
+        width: 100%;
+        height: 100%;
+        border: 1px solid #0074d9; /* Blue border */
+        border-radius: 5px;
+        background: linear-gradient(0deg, #6685ff 0%, #031e5e 100%);
+        color: #00ff00; /* Bright green text color */
+        margin: 0;
+      }
+
+      /* Style links within the iframe's content */
+      div iframe a {
+        text-decoration: none;
+        color: #ffd700; /* Gold link color */
+      }
+
+      /* Style list items within the iframe's content */
+      div iframe ul li {
+        margin-bottom: 6px;
+      }
+
+      /* Style the h2 headings within the iframe's content */
+      div iframe h2 {
+        color: #ff5733; /* Orange heading color */
+        font-size: 18px;
+        margin-top: 20px;
+      }
+
+      /* Style the h1 heading within the iframe's content */
+      div iframe h1 {
+        color: #ff0099; /* Pink h1 color */
+        font-size: 24px;
+      }
+      .videowrapper {
+        float: none;
+        clear: both;
+        width: 80%;
+        position: relative;
+        padding-bottom: 56.25%;
+        padding-top: 25px;
+        height: 0;
+      }
+      .videowrapper iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 80%;
+        height: 80%;
+      }
     </style>
   </head>
   <body>
@@ -57,9 +112,61 @@
     <div id="mute-button">
       <i class="fas fa-volume-mute" id="mute-unmute-music"></i>
     </div>
-
-    <div id="info">
-      <h2></h2>
+    <div id="info" style="display: none">
+      <iframe
+        id="Sol"
+        style="display: none"
+        src="./InfoPlanetes/sol.html"
+        frameborder="0"
+      ></iframe>
+      <iframe
+        id="Mercuri"
+        style="display: none"
+        src="./InfoPlanetes/mercuri.html"
+        frameborder="0"
+      ></iframe>
+      <iframe
+        id="Venus"
+        style="display: none"
+        src="./InfoPlanetes/venus.html"
+        frameborder="0"
+      ></iframe>
+      <iframe
+        id="Terra"
+        style="display: none"
+        src="./InfoPlanetes/terra.html"
+        frameborder="0"
+      ></iframe>
+      <iframe
+        id="Marte"
+        style="display: none"
+        src="./InfoPlanetes/marte.html"
+        frameborder="0"
+      ></iframe>
+      <iframe
+        id="Saturn"
+        style="display: none"
+        src="./InfoPlanetes/saturn.html"
+        frameborder="0"
+      ></iframe>
+      <iframe
+        id="Jupiter"
+        style="display: none"
+        src="./InfoPlanetes/jupiter.html"
+        frameborder="0"
+      ></iframe>
+      <iframe
+        id="Urà"
+        style="display: none"
+        src="./InfoPlanetes/urano.html"
+        frameborder="0"
+      ></iframe>
+      <iframe
+        id="Neptú"
+        style="display: none"
+        src="./InfoPlanetes/neptu.html"
+        frameborder="0"
+      ></iframe>
     </div>
 
     <!-- Este enlace esta recomendado en la web de threejs -->

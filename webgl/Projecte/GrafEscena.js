@@ -13,7 +13,7 @@ export default class GrafEscena {
   constructor() {}
 
   //Construeix l'escena i retorna l'arrel
-  static getEscena(outline) {
+  static getEscena() {
     return new Promise((resolve, reject) => {
       //Crearem una arrel i d'ella penjara tot el que vaja en l'escena
       const root = new THREE.Object3D();
@@ -34,7 +34,7 @@ export default class GrafEscena {
           textures[nom_planeta]
         );
         const objecte = new THREE.Object3D();
-        objecte.add(planeta.getMesh(loader, outline));
+        objecte.add(planeta.getMesh(loader));
         objecte.name = nom_planeta;
         if (nom_planeta === "Terra") {
           const lluna = new Planeta(
@@ -48,7 +48,7 @@ export default class GrafEscena {
           );
           planeta.afegirLluna(lluna);
           const objecte_lluna = new THREE.Object3D();
-          objecte_lluna.add(lluna.getMesh(loader, outline));
+          objecte_lluna.add(lluna.getMesh(loader));
           objecte_lluna.name = "Lluna";
           objecte.add(objecte_lluna);
         }
