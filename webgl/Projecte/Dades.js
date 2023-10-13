@@ -125,14 +125,14 @@ const textures = {
 };
 
 const colorsOrbites = {
-  Mercuri: 0xb7afaa,
-  Venus: 0xf7aa75,
-  Terra: 0x0000ff,
-  Marte: 0xff0000,
-  Jupiter: 0xdc5400,
-  Saturn: 0xd3cf00,
-  Urà: 0x00a58f,
-  Neptú: 0x207ff5,
+  Mercuri: "#9164a4",
+  Venus: "#90651b",
+  Terra: "#0292c2",
+  Marte: "#9a4e19",
+  Jupiter: "#da8b72",
+  Saturn: "#b3a374",
+  Urà: "#67c9d6",
+  Neptú: "#5668a3",
 };
 
 export {

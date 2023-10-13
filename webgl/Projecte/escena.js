@@ -326,7 +326,7 @@ function updateMousePosition(event) {
 
   for (let nom_planeta of nom_planetes) {
     const objecte = scene.getObjectByName(nom_planeta);
-    const interseccion = rayo.intersectObjects(objecte.children, false);
+    const interseccion = rayo.intersectObjects(objecte.children, true);
     if (interseccion.length > 0) {
       document.body.style.cursor = "pointer";
       //NO FUNCIONA AMB LINEWIDTH, S'HAN DE CREAR SHADERS!!!!!
@@ -361,7 +361,8 @@ function listenerClick(event) {
   let hiHaInterseccio = false;
   for (let nom_planeta of nom_planetes) {
     const objecte = scene.getObjectByName(nom_planeta);
-    const interseccion = rayo.intersectObjects(objecte.children, false);
+    //el true és per fer-ho recursiu de manera que si cliquem en l'órbita, el nom del planeta o les llunes, també es detecte
+    const interseccion = rayo.intersectObjects(objecte.children, true);
     if (interseccion.length > 0) {
       showInfo(nom_planeta)();
       hiHaInterseccio = true;
