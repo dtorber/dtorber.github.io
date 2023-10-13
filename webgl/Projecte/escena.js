@@ -23,7 +23,7 @@ let renderer,
   menu_tamany,
   effectController;
 let isMuted = false;
-const musica = false; //flag per a desactivar la musica durant el desenvolupament
+const musica = false; //flag per a desactivar la musica durant el desenvolupament;
 const animacioTraslacioPlanetes = {};
 const animacioRotacioLlunes = {};
 let planetes;
