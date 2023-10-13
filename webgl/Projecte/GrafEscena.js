@@ -7,7 +7,11 @@ import {
   textures,
   radisOffset,
   colorsOrbites,
+  traduccio_ca_es,
 } from "./Dades.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+
 import Planeta from "./Planeta.js";
 export default class GrafEscena {
   constructor() {}
@@ -69,6 +73,26 @@ export default class GrafEscena {
         const ellipse = new THREE.Line(geometry, material);
         ellipse.rotateX(Math.PI / 2); //per a que estiga en el pla XZ i rote al voltant de l'eix Y
         objecte.add(ellipse);
+
+        //creem una textura per a text que penge de cada planeta
+        const fontLoader = new FontLoader();
+
+        fontLoader.load("../fonts/OpenSans.json", function (font) {
+          const geometriaText = new TextGeometry(traduccio_ca_es[nom_planeta], {
+            font: font,
+            size: 10,
+            height: 0.1,
+          });
+          const malla = new THREE.Mesh(
+            geometriaText,
+            new THREE.MeshBasicMaterial()
+          );
+          malla.name = "text_" + nom_planeta;
+          malla.position.x = posX;
+          malla.position.y = radis[nom_planeta] + 10;
+          objecte.add(malla);
+        });
+
         root.add(objecte);
         planetes[nom_planeta] = planeta;
       }

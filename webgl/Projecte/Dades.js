@@ -135,6 +135,19 @@ const colorsOrbites = {
   Neptú: "#5668a3",
 };
 
+const traduccio_ca_es = {
+  Sol: "Sol",
+  Mercuri: "Mercurio",
+  Venus: "Venus",
+  Terra: "Tierra",
+  Marte: "Marte",
+  Jupiter: "Júpiter",
+  Saturn: "Saturno",
+  Urà: "Urano",
+  Neptú: "Neptuno",
+  Lluna: "Luna",
+};
+
 export {
   nom_planetes,
   distancies,
@@ -145,6 +158,7 @@ export {
   colorsOrbites,
   tempsTraslacio,
   tempsRotacioLlunes,
+  traduccio_ca_es,
   VELOCITAT_ROTACIO_TERRA,
   DISTANCIA_TERRA_SOL,
   RADI_TERRA,
