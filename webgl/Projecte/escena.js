@@ -18,8 +18,9 @@ let renderer,
   stats,
   backgroundSound,
   gui,
-  menu_velocidad,
+  menu_velocitat,
   menu_info,
+  menu_tamany,
   effectController;
 let isMuted = false;
 const musica = false; //flag per a desactivar la musica durant el desenvolupament
@@ -267,10 +268,33 @@ function modificarVelocitatRotacioLluna(nom_lluna, factorReduccio) {
   );
 }
 
+function modificarTamanyPlaneta(nom_planeta, factor_increment) {
+  const planeta = scene.getObjectByName(nom_planeta);
+  planeta.scale.set(factor_increment, factor_increment, factor_increment);
+}
+
 function setupGUI() {
   // Definicion de los controles
   effectController = {
     velocidad: 1,
+    velocitat_mercuri: 1,
+    velocitat_venus: 1,
+    velocitat_terra: 1,
+    velocitat_marte: 1,
+    velocitat_jupiter: 1,
+    velocitat_saturn: 1,
+    velocitat_ura: 1,
+    velocitat_neptu: 1,
+    tamany: 1,
+    tamany_sol: 1,
+    tamany_mercuri: 1,
+    tamany_venus: 1,
+    tamany_terra: 1,
+    tamany_marte: 1,
+    tamany_jupiter: 1,
+    tamany_saturn: 1,
+    tamany_ura: 1,
+    tamany_neptu: 1,
     showInfoSol: showInfo("Sol"),
     showInfoMercuri: showInfo("Mercuri"),
     showInfoVenus: showInfo("Venus"),
@@ -288,22 +312,87 @@ function setupGUI() {
   gui.domElement.style.right = "2px"; // Cambia la distancia desde la derecha
   gui.domElement.style.top = "50px"; // Cambia la distancia desde la parte superior
   // Construccion del menu´
-  menu_velocidad = gui.addFolder("Control velocidades");
-  menu_velocidad
-    .add(effectController, "velocidad", 0, 1000, 0.1)
-    .name("Factor de velocidad")
+  menu_velocitat = gui.addFolder("Control velocidades");
+  setupMenuVelocitat(menu_velocitat);
+
+  menu_tamany = gui.addFolder("Control tamaño");
+  setupMenuTamany();
+
+  menu_info = gui.addFolder("Mostrar información");
+  setupMenuInfo();
+}
+
+function setupMenuVelocitat() {
+  menu_velocitat
+    .add(effectController, "velocidad", 1, 1000, 0.1)
+    .name("Factor de velocidad global")
     .onChange((factor_reduccio) => {
-      for (let nom_planeta of nom_planetes) {
-        if (nom_planeta === "Sol") continue; //el sol no rota
-        //encara que siga 0, no passa res perquè no es fa res, serà infinit i aleshores anirà massa lent i punt
-        modificarVelocitatTraslacio(nom_planeta, factor_reduccio);
+      for (let i in nom_planetes) {
+        if (nom_planetes[i] === "Sol") continue; //el sol no es trasllada al voltant d'ell mateix
+        menu_velocitat.controllers[i].setValue(factor_reduccio); //ho canviem en el menu_velocitat i aixi ja ho gestiona cadascun dels planetes
         // for (let lluna of planetes[nom_planeta].llunes) {
         //   modificarVelocitatRotacioLluna(lluna.nom, factor_reduccio);
         // }
       }
     });
 
-  menu_info = gui.addFolder("Mostrar información");
+  menu_velocitat
+    .add(effectController, "velocitat_mercuri", 1, 1000, 0.1)
+    .name("Factor de velocidad Mercurio")
+    .onChange((factor_reduccio) => {
+      modificarVelocitatTraslacio("Mercuri", factor_reduccio);
+    });
+
+  menu_velocitat
+    .add(effectController, "velocitat_venus", 1, 1000, 0.1)
+    .name("Factor de velocidad Venus")
+    .onChange((factor_reduccio) => {
+      modificarVelocitatTraslacio("Venus", factor_reduccio);
+    });
+
+  menu_velocitat
+    .add(effectController, "velocitat_terra", 1, 1000, 0.1)
+    .name("Factor de velocidad Tierra")
+    .onChange((factor_reduccio) => {
+      modificarVelocitatTraslacio("Terra", factor_reduccio);
+    });
+
+  menu_velocitat
+    .add(effectController, "velocitat_marte", 1, 1000, 0.1)
+    .name("Factor de velocidad Marte")
+    .onChange((factor_reduccio) => {
+      modificarVelocitatTraslacio("Marte", factor_reduccio);
+    });
+
+  menu_velocitat
+    .add(effectController, "velocitat_jupiter", 1, 1000, 0.1)
+    .name("Factor de velocidad Jupiter")
+    .onChange((factor_reduccio) => {
+      modificarVelocitatTraslacio("Jupiter", factor_reduccio);
+    });
+
+  menu_velocitat
+    .add(effectController, "velocitat_saturn", 1, 1000, 0.1)
+    .name("Factor de velocidad Saturno")
+    .onChange((factor_reduccio) => {
+      modificarVelocitatTraslacio("Saturn", factor_reduccio);
+    });
+
+  menu_velocitat
+    .add(effectController, "velocitat_ura", 1, 1000, 0.1)
+    .name("Factor de velocidad Urano")
+    .onChange((factor_reduccio) => {
+      modificarVelocitatTraslacio("Urà", factor_reduccio);
+    });
+  menu_velocitat
+    .add(effectController, "velocitat_neptu", 1, 1000, 0.1)
+    .name("Factor de velocidad Neptuno")
+    .onChange((factor_reduccio) => {
+      modificarVelocitatTraslacio("Neptú", factor_reduccio);
+    });
+}
+
+function setupMenuInfo() {
   menu_info.add(effectController, "showInfoSol").name("Sol");
   menu_info.add(effectController, "showInfoMercuri").name("Mercurio");
   menu_info.add(effectController, "showInfoVenus").name("Venus");
@@ -313,6 +402,77 @@ function setupGUI() {
   menu_info.add(effectController, "showInfoSaturn").name("Saturno");
   menu_info.add(effectController, "showInfoUrano").name("Urano");
   menu_info.add(effectController, "showInfoNeptu").name("Neptuno");
+}
+
+function setupMenuTamany() {
+  menu_tamany
+    .add(effectController, "tamany", 1, 10, 0.1)
+    .name("Factor de tamaño global")
+    .onChange((factor_increment) => {
+      for (let nom_planeta of nom_planetes) {
+        modificarTamanyPlaneta(nom_planeta, factor_increment);
+      }
+    });
+  menu_tamany
+    .add(effectController, "tamany_sol", 1, 10, 0.1)
+    .name("Factor de tamaño Sol")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Sol", factor_increment);
+    });
+  menu_tamany
+    .add(effectController, "tamany_mercuri", 1, 10, 0.1)
+    .name("Factor de tamaño Mercurio")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Mercuri", factor_increment);
+    });
+
+  menu_tamany
+    .add(effectController, "tamany_venus", 1, 10, 0.1)
+    .name("Factor de tamaño Venus")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Venus", factor_increment);
+    });
+
+  menu_tamany
+    .add(effectController, "tamany_terra", 1, 10, 0.1)
+    .name("Factor de tamaño Tierra")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Terra", factor_increment);
+    });
+
+  menu_tamany
+    .add(effectController, "tamany_marte", 1, 10, 0.1)
+    .name("Factor de tamaño Marte")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Marte", factor_increment);
+    });
+
+  menu_tamany
+    .add(effectController, "tamany_jupiter", 1, 10, 0.1)
+    .name("Factor de tamaño Jupiter")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Jupiter", factor_increment);
+    });
+
+  menu_tamany
+    .add(effectController, "tamany_saturn", 1, 10, 0.1)
+    .name("Factor de tamaño Saturno")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Saturn", factor_increment);
+    });
+
+  menu_tamany
+    .add(effectController, "tamany_ura", 1, 10, 0.1)
+    .name("Factor de tamaño Urano")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Urà", factor_increment);
+    });
+  menu_tamany
+    .add(effectController, "tamany_neptu", 1, 10, 0.1)
+    .name("Factor de tamaño Neptuno")
+    .onChange((factor_increment) => {
+      modificarTamanyPlaneta("Neptú", factor_increment);
+    });
 }
 
 //Funció per capturar la posició del mouse per poder aplicar més endavant el Hover
