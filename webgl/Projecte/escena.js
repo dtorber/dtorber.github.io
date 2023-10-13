@@ -409,8 +409,10 @@ function setupMenuTamany() {
     .add(effectController, "tamany", 1, 10, 0.1)
     .name("Factor de tamaño global")
     .onChange((factor_increment) => {
-      for (let nom_planeta of nom_planetes) {
+      for (let i in nom_planetes) {
+        const nom_planeta = nom_planetes[i];
         modificarTamanyPlaneta(nom_planeta, factor_increment);
+        // menu_tamany.controllers[i + 1].setValue(factor_increment);
       }
     });
   menu_tamany
@@ -489,6 +491,8 @@ function updateMousePosition(event) {
     const interseccion = rayo.intersectObjects(objecte.children, true);
     if (interseccion.length > 0) {
       document.body.style.cursor = "pointer";
+      //in case of selecting one object then it has to shine
+
       //NO FUNCIONA AMB LINEWIDTH, S'HAN DE CREAR SHADERS!!!!!
       //busque de tots els fills del planeta en la jerarquia el que siga la línia i incremente el seu gruix
       // for (let children of objecte.children) {
