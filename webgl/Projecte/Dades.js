@@ -125,6 +125,7 @@ const textures = {
 };
 
 const colorsOrbites = {
+  Sol: "#f1c40f",
   Mercuri: "#9164a4",
   Venus: "#90651b",
   Terra: "#0292c2",

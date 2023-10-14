@@ -4,12 +4,18 @@ import {
   nom_planetes,
   tempsTraslacio,
   tempsRotacioLlunes,
+  colorsOrbites,
   distancies,
 } from "./Dades.js";
 import GrafEscena from "./GrafEscena.js";
 import Stats from "../lib/stats.module.js";
 import { TWEEN } from "../lib/tween.module.min.js";
 import { GUI } from "../lib/lil-gui.module.min.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
+import { FXAAShader } from "three/addons/shaders/FXAAShader.js";
 
 //Variables estandar
 let renderer,
@@ -27,8 +33,13 @@ const musica = false; //flag per a desactivar la musica durant el desenvolupamen
 const animacioTraslacioPlanetes = {};
 const animacioRotacioLlunes = {};
 let planetes;
+
+//Per al hover amb mouse
 const mouse = new THREE.Vector2();
 const rayo = new THREE.Raycaster();
+let INTERSECTED, composer, renderPass, outline, fxaaShader;
+
+const selectedObjects = [];
 
 let ultimPlanetaVisible;
 const material = new THREE.MeshBasicMaterial({
@@ -40,6 +51,7 @@ function init() {
   scene = new THREE.Scene();
   crearCamera();
   crearControls();
+  crearHover();
   crearFPS();
   //Per a que les càmeres es redimensionen amb la finestra
   const ar = window.innerWidth / window.innerHeight;
@@ -60,6 +72,7 @@ function crearFPS() {
 function crearRenderer() {
   renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setClearColor(0xaaaaaa);
   renderer.autoClear = false;
   document.getElementById("container").appendChild(renderer.domElement);
@@ -82,6 +95,30 @@ function crearControls() {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.minDistance = 1;
   controls.maxDistance = 19000;
+}
+
+function crearHover() {
+  composer = new EffectComposer(renderer);
+  renderPass = new RenderPass(scene, camera);
+
+  composer.addPass(renderPass);
+
+  outline = new OutlinePass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    scene,
+    camera
+  );
+  outline.edgeStrength = 7;
+  outline.edgeThickness = 5;
+  outline.renderToScreen = true;
+  composer.addPass(outline);
+
+  fxaaShader = new ShaderPass(FXAAShader);
+  fxaaShader.uniforms["resolution"].value.set(
+    1 / window.innerWidth,
+    1 / window.innerHeight
+  );
+  composer.addPass(fxaaShader);
 }
 
 function afegirMusica() {
@@ -122,6 +159,12 @@ function muteMusica() {
 //Se cridarà cada vegada que redimensione la finestra
 function updateAspectRatio() {
   renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+  fxaaShader.uniforms["resolution"].value.set(
+    1 / window.innerWidth,
+    1 / window.innerHeight
+  );
+
   //Nova aspect ratio
   const ar = window.innerWidth / window.innerHeight;
 
@@ -139,8 +182,8 @@ function crearSuelo() {
 }
 
 function loadScene() {
-  scene.add(crearSuelo());
-  GrafEscena.getEscena().then((resposta) => {
+  //scene.add(crearSuelo());
+  GrafEscena.getEscena(outline).then((resposta) => {
     const escena = resposta["escena"];
     planetes = resposta["planetes"];
     scene.add(escena);
@@ -155,6 +198,7 @@ function loadScene() {
     }
   });
   loadBackground();
+  console.log(scene);
 }
 
 //Funció que carrega el fons estrellat
@@ -173,12 +217,16 @@ function loadBackground() {
 function update() {}
 
 function render() {
-  requestAnimationFrame(render);
+  render.autoClear = false;
   // update();
   renderer.clear();
-  renderer.render(scene, camera);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  // renderer.render(scene, camera);
+  composer.render();
   //Actualitzem les estadístiques dels FPS
   stats.update();
+
+  requestAnimationFrame(render);
 }
 
 //Funció llançadera per fer tots els moviments dels planetes
@@ -247,7 +295,19 @@ function aplicarRotacionsLlunes() {
 }
 
 //Funció per a fer les rotacions dels planetes sobre ells mateixos
-function aplicarRotacionsPlanetes() {}
+function aplicarRotacionsPlanetes() {
+  for (let nom_planeta of nom_planetes) {
+    const objecte = scene.getObjectByName(nom_planeta);
+    new TWEEN.Tween({ y: 0 })
+      .to({ y: Math.PI * 2 }, 10000)
+      .repeat(Infinity)
+      .onUpdate((coords) => {
+        // menu.controllers[2].setValue((coords.y * 180) / Math.PI);
+        objecte.rotation.y = coords.y;
+      })
+      .start();
+  }
+}
 
 function modificarVelocitatTraslacio(nom_planeta, factorReduccio) {
   animacioTraslacioPlanetes[nom_planeta].duration(
@@ -483,36 +543,52 @@ function updateMousePosition(event) {
   event.preventDefault();
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+  // intersection();
   rayo.setFromCamera(mouse, camera);
-
+  let hiHaInterseccio = false;
   for (let nom_planeta of nom_planetes) {
     const objecte = scene.getObjectByName(nom_planeta);
     const interseccion = rayo.intersectObjects(objecte.children, true);
     if (interseccion.length > 0) {
       document.body.style.cursor = "pointer";
-      //in case of selecting one object then it has to shine
-
-      //NO FUNCIONA AMB LINEWIDTH, S'HAN DE CREAR SHADERS!!!!!
-      //busque de tots els fills del planeta en la jerarquia el que siga la línia i incremente el seu gruix
-      // for (let children of objecte.children) {
-      //   if (children.type === "Line") {
-      //     children.material = new THREE.LineBasicMaterial({
-      //       color: children.material.color,
-      //       linewidth: 40,
-      //     });
-      //     console.log(children);
-      //     break;
-      //   }
-      // }
+      const selected = [];
+      for (let fill of objecte.children) {
+        if (fill.type === "Line" || fill.type === "Mesh") selected.push(fill);
+      }
+      outline.visibleEdgeColor.set(colorsOrbites[nom_planeta]);
+      outline.hiddenEdgeColor.set(colorsOrbites[nom_planeta]);
+      outline.selectedObjects = selected;
+      hiHaInterseccio = true;
       break;
-    } else {
-      document.body.style.cursor = "default";
-      // for (let children of objecte.children) {
-      //   if (children.type === "Line") {
-      //     children.material.linewidth = 1;
-      //   }
-      // }
+    }
+  }
+  if (!hiHaInterseccio) {
+    document.body.style.cursor = "default";
+    outline.selectedObjects = [];
+  }
+}
+function addSelectedObjects(object) {
+  if (selectedObjects.length > 0) {
+    selectedObjects.pop();
+  }
+  selectedObjects.push(object);
+}
+
+function intersection() {
+  rayo.setFromCamera(mouse, camera);
+  for (let nom_planeta of nom_planetes) {
+    const objecte = scene.getObjectByName(nom_planeta);
+    const intersects = rayo.intersectObjects(objecte, true);
+    if (intersects.length > 0) {
+      selectedObjects = [];
+      for (let fill of objecte.children) {
+        if (fill.type === "Line" || fill.type === "Mesh") {
+          selectedObjects.push(fill);
+        }
+      }
+      outline.selectedObjects = selectedObjects;
+      console.log(nom_planeta);
+      break;
     }
   }
 }

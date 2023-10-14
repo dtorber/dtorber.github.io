@@ -25,7 +25,7 @@ export default class Planeta {
     this.llunes = [];
   }
 
-  getMesh(loader) {
+  getMesh(loader, outline) {
     //si no està calculat el creem
     if (!this.mesh) {
       const geometria = new THREE.SphereGeometry(this.radi, 30, 30);
@@ -34,6 +34,7 @@ export default class Planeta {
       if (this.rutaTextura) {
         const textura = loader.load(this.rutaTextura, function (texture) {
           if (texture) {
+            outline.patternTexture = texture;
             texture.wrapS = THREE.RepeatWrapping;
             texture.wrapT = THREE.RepeatWrapping;
           }
