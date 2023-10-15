@@ -6,6 +6,7 @@ import {
   tempsRotacioLlunes,
   colorsOrbites,
   distancies,
+  radis,
 } from "./Dades.js";
 import GrafEscena from "./GrafEscena.js";
 import Stats from "../lib/stats.module.js";
@@ -27,7 +28,8 @@ let renderer,
   menu_velocitat,
   menu_info,
   menu_tamany,
-  effectController;
+  effectController,
+  controls;
 let isMuted = false;
 const musica = false; //flag per a desactivar la musica durant el desenvolupament;
 const animacioTraslacioPlanetes = {};
@@ -42,10 +44,7 @@ let composer, renderPass, outline, fxaaShader;
 const selectedObjects = [];
 
 let ultimPlanetaVisible;
-const material = new THREE.MeshBasicMaterial({
-  color: 0x0000ff,
-  wireframe: true,
-});
+
 function init() {
   crearRenderer();
   scene = new THREE.Scene();
@@ -92,7 +91,7 @@ function crearCamera() {
 
 function crearControls() {
   //Per a poder moure la càmera amb el ratolí
-  const controls = new OrbitControls(camera, renderer.domElement);
+  controls = new OrbitControls(camera, renderer.domElement);
   controls.minDistance = 1;
   controls.maxDistance = 19000;
 }
@@ -173,14 +172,6 @@ function updateAspectRatio() {
   camera.updateProjectionMatrix();
 }
 
-function crearSuelo() {
-  const suelo_geometria = new THREE.PlaneGeometry(10000, 10000, 100, 100);
-  suelo_geometria.name = "suelo";
-  const suelo = new THREE.Mesh(suelo_geometria, material); //es 1000x1000 de tamany i gasta 100 meridians i 100 paral·lels
-  suelo.rotation.x = -Math.PI / 2;
-  return suelo;
-}
-
 function loadScene() {
   //scene.add(crearSuelo());
   GrafEscena.getEscena(outline).then((resposta) => {
@@ -201,8 +192,7 @@ function loadScene() {
   console.log(scene);
 }
 
-//Funció que carrega el fons estrellat
-//ENCARA NO FUNCIONA, ESPERAR A LA 3a PRÀCTICA
+//Funció que carrega el fons estrellat per a la qual cosa el muntem sobre una esfera
 function loadBackground() {
   const loader = new THREE.TextureLoader();
   const geometriaFons = new THREE.SphereGeometry(20000, 100, 100);
@@ -265,22 +255,6 @@ function aplicarTraslacions() {
       })
       .start();
     animacioTraslacioPlanetes[nom_planeta] = rotacio;
-    //Este codi és per fer la traslació de les llunes perquè acompanyen al planeta en cas qeu no siga un fill de la jerarquia
-    // for (let lluna of planetes[nom_planeta].llunes) {
-    //   const llunaObjecte = scene.getObjectByName(lluna.nom);
-    //   const rotacioLluna = new TWEEN.Tween({ y: 0 })
-    //     .to({ y: Math.PI * 2 }, tempsTraslacio[nom_planeta])
-    //     .repeat(Infinity)
-    //     .onUpdate((coords) => {
-    //       // menu.controllers[2].setValue((coords.y * 180) / Math.PI);
-    //       llunaObjecte.setRotationFromAxisAngle(
-    //         new THREE.Vector3(0, 1, 0),
-    //         coords.y
-    //       );
-    //     })
-    //     .start();
-    //   animacioTraslacioPlanetes[lluna.nom] = rotacioLluna;
-    // }
   }
 }
 
@@ -338,13 +312,6 @@ function modificarVelocitatTraslacio(nom_planeta, factorReduccio) {
       tempsTraslacio[nom_planeta] / factorReduccio
     );
   }
-  //les llunes han d'anar traslladant-se al voltant del sol igual que el seu planeta
-  //este codi es en cas que no afegim les llunes com a filles del planeta en la jerarquia
-  // for (let lluna of planetes[nom_planeta].llunes) {
-  //   animacioTraslacioPlanetes[lluna.nom].duration(
-  //     tempsTraslacio[nom_planeta] / factorReduccio
-  //   );
-  // }
 }
 
 function modificarVelocitatRotacioLluna(nom_lluna, factorReduccio) {
@@ -382,15 +349,15 @@ function setupGUI() {
     tamany_saturn: 1,
     tamany_ura: 1,
     tamany_neptu: 1,
-    showInfoSol: showInfo("Sol"),
-    showInfoMercuri: showInfo("Mercuri"),
-    showInfoVenus: showInfo("Venus"),
-    showInfoTerra: showInfo("Terra"),
-    showInfoMarte: showInfo("Marte"),
-    showInfoJupiter: showInfo("Jupiter"),
-    showInfoSaturn: showInfo("Saturn"),
-    showInfoUrano: showInfo("Urà"),
-    showInfoNeptu: showInfo("Neptú"),
+    showInfoSol: clicPlaneta("Sol"),
+    showInfoMercuri: clicPlaneta("Mercuri"),
+    showInfoVenus: clicPlaneta("Venus"),
+    showInfoTerra: clicPlaneta("Terra"),
+    showInfoMarte: clicPlaneta("Marte"),
+    showInfoJupiter: clicPlaneta("Jupiter"),
+    showInfoSaturn: clicPlaneta("Saturn"),
+    showInfoUrano: clicPlaneta("Urà"),
+    showInfoNeptu: clicPlaneta("Neptú"),
   };
 
   // Creacion interfaz
@@ -496,10 +463,8 @@ function setupMenuTamany() {
     .add(effectController, "tamany", 1, 10, 0.1)
     .name("Factor de tamaño global")
     .onChange((factor_increment) => {
-      for (let i in nom_planetes) {
-        const nom_planeta = nom_planetes[i];
-        modificarTamanyPlaneta(nom_planeta, factor_increment);
-        // menu_tamany.controllers[i + 1].setValue(factor_increment);
+      for (let i = 1; i < nom_planetes.length; i++) {
+        menu_tamany.controllers[i].setValue(factor_increment);
       }
     });
   menu_tamany
@@ -601,25 +566,6 @@ function addSelectedObjects(object) {
   selectedObjects.push(object);
 }
 
-function intersection() {
-  rayo.setFromCamera(mouse, camera);
-  for (let nom_planeta of nom_planetes) {
-    const objecte = scene.getObjectByName(nom_planeta);
-    const intersects = rayo.intersectObjects(objecte, true);
-    if (intersects.length > 0) {
-      selectedObjects = [];
-      for (let fill of objecte.children) {
-        if (fill.type === "Line" || fill.type === "Mesh") {
-          selectedObjects.push(fill);
-        }
-      }
-      outline.selectedObjects = selectedObjects;
-      console.log(nom_planeta);
-      break;
-    }
-  }
-}
-
 //Funció per a la gestió del click sobre un planeta que mostrarà informació sobre ell
 function listenerClick(event) {
   let x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -631,7 +577,7 @@ function listenerClick(event) {
     //el true és per fer-ho recursiu de manera que si cliquem en l'órbita, el nom del planeta o les llunes, també es detecte
     const interseccion = rayo.intersectObjects(objecte.children, true);
     if (interseccion.length > 0) {
-      showInfo(nom_planeta)();
+      clicPlaneta(nom_planeta)();
       hiHaInterseccio = true;
       break;
     }
@@ -644,15 +590,55 @@ function listenerClick(event) {
   }
 }
 
+//Funció per a quan es clica en un planeta
+function clicPlaneta(nom_planeta) {
+  //cal que tornem una callback per a poder afegir-ho en el effectController
+  return () => {
+    showInfo(nom_planeta); //mostrem la informació del planeta en qüestió
+    animacioCamera(nom_planeta); //i movem la càmera fins al planeta en qüestió
+  };
+}
+
 //funció per amagar tota la informació menys la del planeta que volem mostrar
 function showInfo(nom_planeta) {
-  return () => {
-    if (ultimPlanetaVisible !== undefined)
-      document.getElementById(ultimPlanetaVisible).style.display = "none";
-    document.getElementById("info").style.display = "block";
-    document.getElementById(nom_planeta).style.display = "block";
-    ultimPlanetaVisible = nom_planeta;
+  if (ultimPlanetaVisible !== undefined)
+    document.getElementById(ultimPlanetaVisible).style.display = "none";
+  document.getElementById("info").style.display = "block";
+  document.getElementById(nom_planeta).style.display = "block";
+  ultimPlanetaVisible = nom_planeta;
+}
+
+function animacioCamera(nom_planeta) {
+  const animate = (t) => {
+    TWEEN.update(t);
+    window.requestAnimationFrame(animate);
   };
+  animate();
+  const objecte = scene.getObjectByName(nom_planeta).children[0]; //me quede amb el mesh que és el que té la posició realment
+  let position = new THREE.Vector3();
+  position.getPositionFromMatrix(objecte.matrixWorld);
+  new TWEEN.Tween({
+    x: camera.position.x,
+    y: camera.position.y,
+    z: camera.position.z,
+  })
+    .to(
+      {
+        x: position.x - radis["Sol"] - radis[nom_planeta],
+        y: position.y,
+        z: position.z,
+      },
+      3000
+    )
+    .onUpdate((coords) => {
+      camera.position.x = coords.x;
+      camera.position.y = coords.y;
+      camera.position.z = coords.z;
+      camera.lookAt(position);
+      controls.target = position;
+    })
+    .easing(TWEEN.Easing.Quadratic.InOut)
+    .start();
 }
 
 //Accions

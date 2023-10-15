@@ -90,6 +90,10 @@ export default class GrafEscena {
           malla.name = "text_" + nom_planeta;
           malla.position.x = posX;
           malla.position.y = radis[nom_planeta] + 10;
+          malla.setRotationFromAxisAngle(
+            new THREE.Vector3(0, 1, 0),
+            -Math.PI / 2
+          );
           objecte.add(malla);
         });
 
