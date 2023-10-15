@@ -108,7 +108,7 @@ const tempsTraslacio = {
 };
 
 const tempsRotacioLlunes = {
-  Lluna: (27.32 * 24 * 3600 * 1000) / 10000,
+  Lluna: (27.32 * 24 * 3600 * 1000) / 100000,
 };
 
 const textures = {
