@@ -35,7 +35,9 @@ export default class GrafEscena {
           posX,
           0,
           0,
-          textures[nom_planeta]
+          textures[nom_planeta],
+          textures[nom_planeta + "Bump"],
+          textures[nom_planeta + "Spec"]
         );
         const objecte = new THREE.Object3D();
         objecte.add(planeta.getMesh(loader, outline));

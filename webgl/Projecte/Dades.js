@@ -122,6 +122,11 @@ const textures = {
   Urà: "../textures/uranus_texture.jpg",
   Neptú: "../textures/neptune_texture.jpg",
   Lluna: "../textures/moon_texture.jpg",
+  TerraSpec: "../textures/earth_spec_texture.jpg",
+  MercuriBump: "../textures/mercury_bump_texture.jpg",
+  VenusBump: "../textures/venus_bump_texture.jpg",
+  TerraBump: "../textures/earth_bump_texture.jpg",
+  MarteBump: "../textures/mars_bump_texture.jpg",
 };
 
 const colorsOrbites = {

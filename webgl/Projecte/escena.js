@@ -52,6 +52,7 @@ function init() {
   crearControls();
   crearHover();
   crearFPS();
+  crearLlums();
   //Per a que les càmeres es redimensionen amb la finestra
   const ar = window.innerWidth / window.innerHeight;
   //Captura d'esdeveniments
@@ -74,6 +75,7 @@ function crearRenderer() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setClearColor(0xaaaaaa);
   renderer.autoClear = false;
+  renderer.updateShadowMap.enabled = true;
   document.getElementById("container").appendChild(renderer.domElement);
 }
 
@@ -118,6 +120,20 @@ function crearHover() {
     1 / window.innerHeight
   );
   composer.addPass(fxaaShader);
+}
+
+function crearLlums() {
+  //Llum ambient
+  const alight = new THREE.AmbientLight(0x222222);
+  scene.add(alight);
+
+  //Llum amb ombres que actua com si fora la llum del sol
+  const plight = new THREE.PointLight(0xffffff, 1);
+  plight.position.set(0, 0, 0);
+  plight.castShadow = true;
+  plight.shadow.mapSize.width = 512; // açò és per a la qualitat de les ombres
+  plight.shadow.mapSize.height = 512;
+  scene.add(plight);
 }
 
 function afegirMusica() {
@@ -558,12 +574,6 @@ function updateMousePosition(event) {
     document.body.style.cursor = "default";
     outline.selectedObjects = [];
   }
-}
-function addSelectedObjects(object) {
-  if (selectedObjects.length > 0) {
-    selectedObjects.pop();
-  }
-  selectedObjects.push(object);
 }
 
 //Funció per a la gestió del click sobre un planeta que mostrarà informació sobre ell
