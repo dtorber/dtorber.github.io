@@ -44,7 +44,7 @@ function init() {
     1,
     1000
   );
-  camera.position.set(200, 200, 200);
+  camera.position.set(100, 300, 200);
   camera.lookAt(0, 1, 0);
 
   //Afegir controls:
@@ -406,15 +406,18 @@ function crearLlums() {
   const puntual = new THREE.PointLight(0xffffff, 0.5);
   puntual.position.set(2, 300, -4);
   scene.add(puntual);
-  // scene.add(new THREE.CameraHelper(puntual.shadow.camera));
+
+  const puntual2 = new THREE.PointLight(0xffffff, 0.5);
+  puntual2.position.set(2, 150, 20);
+  scene.add(puntual2);
 
   const focal = new THREE.SpotLight(0xffffff, 0.3);
-  focal.position.set(-100, 500, 4);
+  focal.position.set(-300, 500, -50);
   focal.target.position.set(0, 0, 0);
   focal.angle = Math.PI / 7;
   focal.penumbra = 0.3;
   focal.castShadow = true;
-  focal.shadow.camera.far = 600;
+  focal.shadow.camera.far = 800;
   focal.shadow.camera.fov = 80;
   scene.add(focal);
   scene.add(new THREE.CameraHelper(focal.shadow.camera));

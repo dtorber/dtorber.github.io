@@ -10,6 +10,9 @@ function crearRobotSuelo(materialPiso, materialRobot) {
   const suelo = crear_piso(materialPiso);
   root.add(suelo);
 
+  const habitacio = crear_habitacio();
+  root.add(habitacio);
+
   //Crear el robot que serà el pare de tot
   const robot = new THREE.Object3D();
   robot.name = "robot";
@@ -52,12 +55,9 @@ function crear_base_robot(material) {
   const root = new THREE.Object3D();
   root.name = "base";
   const base = new THREE.CylinderGeometry(radi, radi, altura, 50, 1);
-  material = material.clone();
+  material = new THREE.MeshLambertMaterial();
   loader.load("../textures/bronze_texture.jpg", (texture) => {
     material.map = texture;
-    material.map.wrapS = THREE.RepeatWrapping;
-    material.map.wrapT = THREE.RepeatWrapping;
-    material.map.repeat.set(1, 1);
     material.needsUpdate = true;
   });
   let base_mesh = new THREE.Mesh(base, material);
@@ -94,12 +94,9 @@ function crear_eix(material) {
   const root = new THREE.Object3D();
   root.name = "eix";
   const eix_geometria = new THREE.CylinderGeometry(radi, radi, height, 50, 1);
-  material = material.clone();
+  material = new THREE.MeshLambertMaterial();
   loader.load("../textures/bronze_texture.jpg", (texture) => {
     material.map = texture;
-    material.map.wrapS = THREE.RepeatWrapping;
-    material.map.wrapT = THREE.RepeatWrapping;
-    material.map.repeat.set(1, 1);
     material.needsUpdate = true;
   });
   const eix = new THREE.Mesh(eix_geometria, material);
@@ -118,12 +115,9 @@ function crear_esparrec(material) {
   root.name = "esparrec";
   const esparrec_geometria = new THREE.BoxGeometry(width, height, depth);
   esparrec_geometria.name = "esparrec";
-  material = material.clone();
+  material = new THREE.MeshLambertMaterial();
   loader.load("../textures/bronze_texture.jpg", (texture) => {
     material.map = texture;
-    material.map.wrapS = THREE.RepeatWrapping;
-    material.map.wrapT = THREE.RepeatWrapping;
-    material.map.repeat.set(1, 1);
     material.needsUpdate = true;
   });
   const esparrec = new THREE.Mesh(esparrec_geometria, material);
@@ -142,6 +136,24 @@ function crear_rotula(material, altura = 120) {
   const root = new THREE.Object3D();
   root.name = "rotula";
   const rotula_geometria = new THREE.SphereGeometry(radi);
+
+  const entorn = [
+    "../textures/px.png",
+    "../textures/nx.png",
+    "../textures/py.png",
+    "../textures/ny.png",
+    "../textures/pz.png",
+    "../textures/nz.png",
+  ];
+  const texturaRotula = new THREE.CubeTextureLoader().load(entorn);
+
+  material = new THREE.MeshPhongMaterial({
+    color: "white",
+    specular: 0xffd700,
+    shininess: 30,
+    envMap: texturaRotula,
+  });
+
   const rotula = new THREE.Mesh(rotula_geometria, material);
   //fa falta que ho pugem per tal que la rótula estiga enganxada amb l'espàrrec
   rotula.position.y = altura;
@@ -154,9 +166,9 @@ function crear_antebrazo(material, altura = 80) {
   material = new THREE.MeshPhongMaterial({
     color: 0xffd700,
     specular: 0x111111,
-    shininess: 40,
-    emissive: new THREE.Color(0xffd700),
-    emissiveIntensity: 0.2,
+    shininess: 100,
+    // emissive: new THREE.Color(0xffd700),
+    // emissiveIntensity: 0.2,
   });
   const ante_brazo = new THREE.Object3D();
   ante_brazo.name = "antebrazo";
@@ -179,13 +191,10 @@ function crear_disc(material) {
   root.name = "disc";
   const disc_geometria = new THREE.CylinderGeometry(radi, radi, altura, 50, 1);
   material = material.clone();
-  // loader.load("../textures/gold_texture.jpeg", (texture) => {
-  //   material.map = texture;
-  //   material.map.wrapS = THREE.RepeatWrapping;
-  //   material.map.wrapT = THREE.RepeatWrapping;
-  //   material.map.repeat.set(1, 1);
-  //   material.needsUpdate = true;
-  // });
+  loader.load("../textures/gold_texture.jpg", (texture) => {
+    material.map = texture;
+    material.needsUpdate = true;
+  });
   const disc = new THREE.Mesh(disc_geometria, material);
   root.add(disc);
   return root;
@@ -214,13 +223,10 @@ function crear_nervis(material) {
     r / 2,
   ];
   material = material.clone();
-  // loader.load("../textures/gold_texture.jpeg", (texture) => {
-  //   material.map = texture;
-  //   material.map.wrapS = THREE.RepeatWrapping;
-  //   material.map.wrapT = THREE.RepeatWrapping;
-  //   material.map.repeat.set(1, 1);
-  //   material.needsUpdate = true;
-  // });
+  loader.load("../textures/gold_texture.jpg", (texture) => {
+    material.map = texture;
+    material.needsUpdate = true;
+  });
   for (let i = 0; i < 4; i += 1) {
     const nervi = new THREE.Mesh(
       new THREE.BoxGeometry(width, height, depth),
@@ -252,13 +258,10 @@ function crear_monyica(material, altura = 80) {
     1
   );
   const nouMaterial = material.clone();
-  // loader.load("../textures/gold_texture.jpeg", (texture) => {
-  //   nouMaterial.map = texture;
-  //   nouMaterial.map.wrapS = THREE.RepeatWrapping;
-  //   nouMaterial.map.wrapT = THREE.RepeatWrapping;
-  //   nouMaterial.map.repeat.set(1, 1);
-  //   nouMaterial.needsUpdate = true;
-  // });
+  loader.load("../textures/brillante.jpg", (texture) => {
+    nouMaterial.map = texture;
+    nouMaterial.needsUpdate = true;
+  });
   const monyica = new THREE.Mesh(monyica_geometria, nouMaterial);
   //ho pugem perquè estiga al final del braç
   monyica.position.y = altura;
@@ -273,11 +276,8 @@ function crear_monyica(material, altura = 80) {
 //Funció per crear la mà del robot
 function crear_ma(material, altura = 80) {
   material = new THREE.MeshStandardMaterial();
-  loader.load("../textures/diamond_texture.jpg", (texture) => {
+  loader.load("../textures/diamond_texture2.jpg", (texture) => {
     material.map = texture;
-    material.map.wrapS = THREE.RepeatWrapping;
-    material.map.wrapT = THREE.RepeatWrapping;
-    material.map.repeat.set(10, 10);
     material.needsUpdate = true;
   });
   const mans = new THREE.Object3D();
@@ -429,22 +429,6 @@ function crear_ganxo(material) {
     8,
   ]);
 
-  //Definir les normals de cada triangle
-  //Tindrà la mateixa mida que triangles perquè per cada triangle (3 vértexs) hi haurà una normal amb (x, y, z)
-  // const normals = new Float32Array(triangles.length);
-  // for (let i = 0; i < triangles.length; i += 3) {
-  //     //anem a cadascun dels triangles i agafem cadascun dels vértexs i traem la seua (x,y,z) amb vertices
-  //     const v1 = new THREE.Vector3(vertices[3 * triangles[i]], vertices[3 * triangles[i] + 1], vertices[3 * triangles[i] + 2]);
-  //     const v2 = new THREE.Vector3(vertices[3 * triangles[i + 1]], vertices[3 * triangles[i + 1] + 1], vertices[3 * triangles[i + 1] + 2]);
-  //     const v3 = new THREE.Vector3(vertices[3 * triangles[i + 2]], vertices[3 * triangles[i + 2] + 1], vertices[3 * triangles[i + 2] + 2]);
-  //     //calculem la normal de cada cara amb els 3 vértexs
-  //     const normal = calcular_normal(v1, v2, v3);
-  //     //i asssignem la normal d'eixa cara
-  //     normals[i] = normal.x
-  //     normals[i + 1] = normal.y
-  //     normals[i + 2] = normal.z;
-  // }
-
   //Definir la geometria
   const root = new THREE.Object3D();
   root.name = "ganxo";
@@ -459,16 +443,47 @@ function crear_ganxo(material) {
   return root;
 }
 
-//Funcions auxiliars
-//Funció per calcular les normals -> No la gastem, en lloc d'això fem servir el computeVertexNormals()
-function calcular_normal(v1, v2, v3) {
-  const vector1 = new THREE.Vector3();
-  const vector2 = new THREE.Vector3();
-  vector1.subVectors(v2, v1);
-  vector2.subVectors(v3, v1);
-  vector1.cross(vector2);
-  vector1.normalize();
-  return vector1;
+function crear_habitacio() {
+  const parets = [];
+  parets.push(
+    new THREE.MeshBasicMaterial({
+      side: THREE.BackSide,
+      map: new THREE.TextureLoader().load("../textures/px.png"),
+    })
+  );
+  parets.push(
+    new THREE.MeshBasicMaterial({
+      side: THREE.BackSide,
+      map: new THREE.TextureLoader().load("../textures/nx.png"),
+    })
+  );
+  parets.push(
+    new THREE.MeshBasicMaterial({
+      side: THREE.BackSide,
+      map: new THREE.TextureLoader().load("../textures/py.png"),
+    })
+  );
+  parets.push(
+    new THREE.MeshBasicMaterial({
+      side: THREE.BackSide,
+      map: new THREE.TextureLoader().load("../textures/ny.png"),
+    })
+  );
+  parets.push(
+    new THREE.MeshBasicMaterial({
+      side: THREE.BackSide,
+      map: new THREE.TextureLoader().load("../textures/pz.png"),
+    })
+  );
+  parets.push(
+    new THREE.MeshBasicMaterial({
+      side: THREE.BackSide,
+      map: new THREE.TextureLoader().load("../textures/nz.png"),
+    })
+  );
+
+  const geomtria = new THREE.BoxGeometry(1000, 1000, 1000, 100, 100, 100);
+  return new THREE.Mesh(geomtria, parets);
 }
 
 export default crearRobotSuelo;
