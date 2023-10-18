@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!-- saved from url=(0099)https://poliformat.upv.es/access/content/group/DOC_33994_2023/Seminarios/Seminario%2004/escena.html -->
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <title>Aplicacion basica en Threejs</title>
+    <style>
+      body {
+        background-color: white;
+        margin: 0px;
+        overflow: hidden;
+      }
+      #info {
+        position: absolute;
+        bottom: 0px;
+        left: 50px;
+        width: 30%;
+        text-align: left;
+        z-index: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+    <div id="info">
+      <h2>Threejs basic example</h2>
+    </div>
+
+    <!-- Declaracion del espacio de nombres de Threejs -->
+    <script type="importmap">
+      { "imports": { "three": "../lib/three.module.js" } }
+    </script>
+
+    <!-- mi script -->
+    <!-- <script type="module" src="Escena.js"></script> -->
+    <script type="module" src="./escena.js"></script>
+  </body>
+</html>

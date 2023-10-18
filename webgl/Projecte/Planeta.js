@@ -67,7 +67,7 @@ export default class Planeta {
             specMap = textureLoader.load(this.rutaSpecTexture);
           if (this.rutaBumpTexture)
             bumpMap = textureLoader.load(this.rutaBumpTexture);
-          material = new THREE.MeshPhongMaterial({
+          material = new THREE.MeshStandardMaterial({
             map: textura,
             wireframe: false,
             specularMap: specMap,
@@ -77,7 +77,7 @@ export default class Planeta {
           });
         }
       } else {
-        material = new THREE.MeshNormalMaterial({
+        material = new THREE.MeshStandardMaterial({
           flatShadig: true,
           wireframe: false,
         });

@@ -268,7 +268,7 @@ function performAnimation() {
 }
 
 function animacioBase() {
-  const inici = 0,
+  const inici = -Math.PI / 2,
     fi = -(2 * Math.PI) / 3;
   const tween = new TWEEN.Tween({ y: inici })
     .to({ y: fi }, 6000)

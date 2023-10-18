@@ -73,7 +73,7 @@ function crearRenderer() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setClearColor(0xaaaaaa);
   renderer.autoClear = false;
-  // renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = true;
   renderer.updateShadowMap.enabled = true;
   document.getElementById("container").appendChild(renderer.domElement);
 }
@@ -128,16 +128,22 @@ function crearLlums() {
 
   //Llum amb ombres que actua com si fora la llum del sol
   const plight = new THREE.PointLight(0xffffff, 1);
-  plight.position.set(0, 0, 0);
-  plight.setRotationFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
+  plight.position.set(0, -20, 0);
   plight.castShadow = true;
   plight.shadow.mapSize.width = 512; // açò és per a la qualitat de les ombres
   plight.shadow.mapSize.height = 512;
   plight.shadow.camera.far = 10000;
   scene.add(plight);
 
+  scene.traverse((node) => {
+    if (node.isMesh) {
+      node.castShadow = true;
+      node.receiveShadow = true;
+    }
+  });
+
   const helper = new THREE.CameraHelper(plight.shadow.camera);
-  // scene.add(helper);
+  scene.add(helper);
 }
 
 function afegirMusica() {
