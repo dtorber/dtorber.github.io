@@ -98,8 +98,11 @@ export default class GrafEscena {
           );
           objecte.add(malla);
         });
+        const contenidor = new THREE.Object3D();
+        contenidor.add(objecte);
+        contenidor.name = "contenidor_" + nom_planeta;
 
-        root.add(objecte);
+        root.add(contenidor);
         planetes[nom_planeta] = planeta;
       }
       resolve({

@@ -30,8 +30,8 @@ let renderer,
   menu_tamany,
   effectController,
   controls;
-let isMuted = false;
-const musica = false; //flag per a desactivar la musica durant el desenvolupament;
+let isMuted = true;
+const musica = true; //flag per a desactivar la musica durant el desenvolupament;
 const animacioTraslacioPlanetes = {};
 const animacioRotacioLlunes = {};
 let planetes;
@@ -40,8 +40,6 @@ let planetes;
 const mouse = new THREE.Vector2();
 const rayo = new THREE.Raycaster();
 let composer, renderPass, outline, fxaaShader;
-
-const selectedObjects = [];
 
 let ultimPlanetaVisible;
 
@@ -75,6 +73,7 @@ function crearRenderer() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setClearColor(0xaaaaaa);
   renderer.autoClear = false;
+  // renderer.shadowMap.enabled = true;
   renderer.updateShadowMap.enabled = true;
   document.getElementById("container").appendChild(renderer.domElement);
 }
@@ -130,10 +129,15 @@ function crearLlums() {
   //Llum amb ombres que actua com si fora la llum del sol
   const plight = new THREE.PointLight(0xffffff, 1);
   plight.position.set(0, 0, 0);
+  plight.setRotationFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI);
   plight.castShadow = true;
   plight.shadow.mapSize.width = 512; // açò és per a la qualitat de les ombres
   plight.shadow.mapSize.height = 512;
+  plight.shadow.camera.far = 10000;
   scene.add(plight);
+
+  const helper = new THREE.CameraHelper(plight.shadow.camera);
+  // scene.add(helper);
 }
 
 function afegirMusica() {
@@ -143,14 +147,17 @@ function afegirMusica() {
 
     const audioLoader = new THREE.AudioLoader();
     backgroundSound = new THREE.Audio(listener);
-    audioLoader.load("../sounds/interstellar.mp3", function (buffer) {
-      backgroundSound.setBuffer(buffer);
-      backgroundSound.setLoop(true);
-      backgroundSound.setVolume(0.25);
-      backgroundSound.play();
-      //resolem la promesa una vegada s'ha carregat la música
-      resolve();
-    });
+    audioLoader.load(
+      "../sounds/interstellar_short_short.mp3",
+      function (buffer) {
+        backgroundSound.setBuffer(buffer);
+        backgroundSound.setLoop(true);
+        backgroundSound.setVolume(0.25);
+        // backgroundSound.play();
+        //resolem la promesa una vegada s'ha carregat la música
+        resolve();
+      }
+    );
   });
 }
 
@@ -161,6 +168,7 @@ function muteMusica() {
     document.getElementById("mute-button").innerHTML =
       "<i class='fas fa-volume-mute' id='mute-unmute-music''></i>";
     backgroundSound.setVolume(0.25);
+    backgroundSound.play();
   } else {
     document.getElementById("mute-button").innerHTML =
       "<i class='fas fa-volume-up' id='mute-unmute-music''></i>";
@@ -189,16 +197,18 @@ function updateAspectRatio() {
 }
 
 function loadScene() {
-  //scene.add(crearSuelo());
   GrafEscena.getEscena(outline).then((resposta) => {
     const escena = resposta["escena"];
     planetes = resposta["planetes"];
     scene.add(escena);
     if (musica) {
-      afegirMusica().then(() => {
-        render();
-        aplicarMovimentsPlanetes();
-      });
+      // afegirMusica().then(() => {
+      //   render();
+      //   aplicarMovimentsPlanetes();
+      // });
+      afegirMusica();
+      render();
+      aplicarMovimentsPlanetes();
     } else {
       render();
       aplicarMovimentsPlanetes();
@@ -252,7 +262,7 @@ function aplicarTraslacions() {
 
   for (let nom_planeta of nom_planetes) {
     if (nom_planeta === "Sol") continue; //el sol no rota
-    const planeta = scene.getObjectByName(nom_planeta);
+    const planeta = scene.getObjectByName("contenidor_" + nom_planeta);
     const rotacio = new TWEEN.Tween({ y: 0 })
       .to({ y: Math.PI * 2 }, tempsTraslacio[nom_planeta])
       .repeat(Infinity)
@@ -283,8 +293,6 @@ function aplicarRotacionsLlunes() {
   animate();
   for (let planeta of Object.values(planetes)) {
     for (let lluna of planeta.llunes) {
-      const objectePlaneta = scene.getObjectByName(planeta.nom);
-      const meshPlaneta = objectePlaneta.children[0]; //com hem aplicat la traslació sobre el mesh en lloc de sobre tot l'Object3D ara hem de mirar també el Mesh.
       const objecteLluna = scene.getObjectByName(lluna.nom);
       const rotacio = new TWEEN.Tween({ y: 0 })
         .to({ y: Math.PI * 2 }, tempsRotacioLlunes[lluna.nom])
@@ -316,7 +324,7 @@ function aplicarRotacionsPlanetes() {
       .repeat(Infinity)
       .onUpdate((coords) => {
         // menu.controllers[2].setValue((coords.y * 180) / Math.PI);
-        objecte.setRotationFromAxisAngle(new THREE.Vector3(0, 1, 0), coords.y);
+        objecte.rotation.y = coords.y;
       })
       .start();
   }
@@ -479,7 +487,7 @@ function setupMenuTamany() {
     .add(effectController, "tamany", 1, 10, 0.1)
     .name("Factor de tamaño global")
     .onChange((factor_increment) => {
-      for (let i = 1; i < nom_planetes.length; i++) {
+      for (let i = 1; i < menu_tamany.controllers.length; i++) {
         menu_tamany.controllers[i].setValue(factor_increment);
       }
     });
