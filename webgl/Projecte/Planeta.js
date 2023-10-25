@@ -98,31 +98,6 @@ export default class Planeta {
     this.llunes.push(lluna);
   }
 
-  // getMesh(loader) {
-  //   return new Promise((resolve, reject) => {
-  //     //si no està calculat el creem
-  //     if (!this.mesh) {
-  //       const geometria = new THREE.SphereGeometry(this.radi, 30, 30);
-  //       //en cas que no li hagem passat cap ruta de textura, creem una de normal
-  //       loader.load(this.rutaTextura, function (textura) {
-  //         textura.wrapS = THREE.RepeatWrapping;
-  //         textura.wrapT = THREE.RepeatWrapping;
-  //         const material = new THREE.MeshBasicMaterial({
-  //           map: textura,
-  //           wireframe: false,
-  //         });
-  //         this.mesh = new THREE.Mesh(geometria, material);
-  //         this.mesh.position.set(this.posX, this.posY, this.posZ);
-  //         if (this.nom === "Sol") {
-  //           this.mesh.rotateX(Math.PI);
-  //           this.mesh.rotateZ(Math.PI / 2);
-  //         }
-  //         resolve(this.mesh);
-  //       });
-  //     } else resolve(this.mesh);
-  //   });
-  // }
-
   /**
    *
    * @returns {InfoPlaneta} Retorna un objecte amb la informació del planeta

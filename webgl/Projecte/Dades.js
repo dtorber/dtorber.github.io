@@ -94,7 +94,7 @@ const velocitatsRotacio = {
   Neptú: 6.174714104193138,
 };
 
-//en milisegosn que es lo que necessita l'animació
+//en milisegosn que es lo que necessita l'animació però la divisió entre 100000 és perquè siga visible
 const tempsTraslacio = {
   Sol: 0,
   Mercuri: (88 * 24 * 3600 * 1000) / 100000,
@@ -107,6 +107,21 @@ const tempsTraslacio = {
   Neptú: ((164 * 365 + 298) * 24 * 3600 * 1000) / 100000,
 };
 
+//temps de rotacio dels planetes sobre el seu propi eix
+const tempsRotacio = {
+  Sol: (27 * 24 * 3600 * 1000) / 10000,
+  Mercuri: (1408 * 3600 * 1000) / 10000,
+  Venus: (5832 * 3600 * 1000) / 10000,
+  Terra: (24 * 3600 * 1000) / 10000,
+  Marte: (25 * 3600 * 1000) / 10000,
+  Jupiter: (10 * 3600 * 1000) / 10000,
+  Saturn: (11 * 3600 * 1000) / 10000,
+  Urà: (17 * 3600 * 1000) / 10000,
+  Neptú: (16 * 3600 * 1000) / 10000,
+  Lluna: (27 * 24 * 3600 * 1000) / 10000,
+};
+
+//temps de rotacio de les llunes al voltant dels seuss
 const tempsRotacioLlunes = {
   Lluna: (27.32 * 24 * 3600 * 1000) / 100000,
 };
@@ -163,6 +178,7 @@ export {
   textures,
   colorsOrbites,
   tempsTraslacio,
+  tempsRotacio,
   tempsRotacioLlunes,
   traduccio_ca_es,
   VELOCITAT_ROTACIO_TERRA,

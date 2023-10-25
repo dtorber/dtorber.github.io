@@ -72,8 +72,11 @@ export default class GrafEscena {
         const material = new THREE.LineBasicMaterial({
           color: colorsOrbites[nom_planeta],
         });
-        const ellipse = new THREE.Line(geometry, material);
+        const ellipse = new THREE.Object3D();
+        ellipse.name = "orbita_" + nom_planeta;
+        ellipse.add(new THREE.Line(geometry, material));
         ellipse.rotateX(Math.PI / 2); //per a que estiga en el pla XZ i rote al voltant de l'eix Y
+        // root.add(ellipse); //per si apliquem una traslació
         objecte.add(ellipse);
 
         //creem una textura per a text que penge de cada planeta
@@ -98,11 +101,9 @@ export default class GrafEscena {
           );
           objecte.add(malla);
         });
-        const contenidor = new THREE.Object3D();
-        contenidor.add(objecte);
-        contenidor.name = "contenidor_" + nom_planeta;
-
-        root.add(contenidor);
+        objecte.receiveShadow = true;
+        objecte.castShadow = true;
+        root.add(objecte);
         planetes[nom_planeta] = planeta;
       }
       resolve({
