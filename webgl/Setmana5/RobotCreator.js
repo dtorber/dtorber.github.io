@@ -435,8 +435,9 @@ function crear_ganxo(material) {
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
   geometry.setIndex(new THREE.BufferAttribute(triangles, 1));
-  // geometry.setAttribute('normal', new THREE.BufferAttribute(normals, 3));
   geometry.computeVertexNormals();
+  afegirTexturaEspecial(geometry);
+
   //Assignar la geometria
   const ganxo = new THREE.Mesh(geometry, material);
   root.add(ganxo);
@@ -484,6 +485,56 @@ function crear_habitacio() {
 
   const geomtria = new THREE.BoxGeometry(1000, 1000, 1000, 100, 100, 100);
   return new THREE.Mesh(geomtria, parets);
+}
+
+/**
+ * Per a cada vertex de la geometria, calcula les coordenades de textura
+ * Ens hem recolzat en el codi creat en el repositori: https://github.com/boytchev/suica/blob/main/src/suica-convex.js
+ * tot i que està readaptat per al nostre problema
+ */
+function afegirTexturaEspecial(geometry) {
+  const MAX_X = 1,
+    MAX_Y = 2,
+    MAX_Z = 3;
+  geometry.computeBoundingBox();
+  let { min, max } = geometry.boundingBox;
+  let offset = new THREE.Vector3(0 - min.x, 0 - min.y, 0 - min.z);
+  let range = new THREE.Vector3(max.x - min.x, max.y - min.y, max.z - min.z);
+  let uvs = [];
+  let pos = geometry.getAttribute("position"),
+    normals = geometry.getAttribute("normal");
+  for (let i = 0; i < pos.count; i++) {
+    //ens quedem amb les dos components mínimes del vector normal: XY, YZ o XZ
+    let normalX = Math.abs(normals.getX(i)),
+      normalY = Math.abs(normals.getY(i)),
+      normalZ = Math.abs(normals.getZ(i));
+
+    let maxim = MAX_X;
+    if (normalY >= normalX && normalY >= normalZ) maxim = MAX_Y;
+    else if (normalZ >= normalX && normalZ >= normalX) maxim = MAX_Z;
+
+    //agafem les x,y,z i les hem de normalitzar perquè reprsenten coordenades en UV.
+    let x = (pos.getX(i) + offset.x) / range.x,
+      y = (pos.getY(i) + offset.y) / range.y,
+      z = (pos.getZ(i) + offset.z) / range.z;
+
+    switch (maxim) {
+      case MAX_X:
+        uvs.push(y, z);
+        break;
+      case MAX_Y:
+        uvs.push(x, z);
+        break;
+      case MAX_Z:
+        uvs.push(x, y);
+        break;
+    }
+  }
+
+  geometry.setAttribute(
+    "uv",
+    new THREE.BufferAttribute(new Float32Array(uvs), 2)
+  );
 }
 
 export default crearRobotSuelo;
