@@ -94,7 +94,7 @@ function crearControls() {
   //Per a poder moure la càmera amb el ratolí
   controls = new OrbitControls(camera, renderer.domElement);
   controls.minDistance = 1;
-  controls.maxDistance = 19000;
+  controls.maxDistance = 15000;
 }
 
 function crearHover() {

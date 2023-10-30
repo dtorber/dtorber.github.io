@@ -61,7 +61,12 @@ export default class GrafEscena {
           );
           planeta.afegirLluna(lluna);
           const objecte_lluna = new THREE.Object3D();
-          objecte_lluna.add(lluna.getMesh(loader, outline));
+          objecte_lluna.castShadow = true;
+          objecte_lluna.receiveShadow = true;
+          const meshLluna = lluna.getMesh(loader, outline);
+          meshLluna.castShadow = true;
+          meshLluna.receiveShadow = true;
+          objecte_lluna.add(meshLluna);
           objecte_lluna.name = "Lluna";
           objecte.add(objecte_lluna);
         }
