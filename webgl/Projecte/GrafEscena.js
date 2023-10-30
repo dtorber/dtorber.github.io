@@ -9,8 +9,8 @@ import {
   colorsOrbites,
   traduccio_ca_es,
 } from "./Dades.js";
-import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
-import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "../lib/examples/jsm/geometries/TextGeometry.js";
+import { FontLoader } from "../lib/examples/jsm/loaders/FontLoader.js";
 
 import Planeta from "./Planeta.js";
 export default class GrafEscena {

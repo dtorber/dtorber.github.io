@@ -13,11 +13,11 @@ import GrafEscena from "./GrafEscena.js";
 import Stats from "../lib/stats.module.js";
 import { TWEEN } from "../lib/tween.module.min.js";
 import { GUI } from "../lib/lil-gui.module.min.js";
-import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
-import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
-import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
-import { FXAAShader } from "three/addons/shaders/FXAAShader.js";
+import { EffectComposer } from "../lib/examples/jsm/postprocessing/EffectComposer.js";
+import { ShaderPass } from "../lib/examples/jsm/postprocessing/ShaderPass.js";
+import { RenderPass } from "../lib/examples/jsm/postprocessing/RenderPass.js";
+import { OutlinePass } from "../lib/examples/jsm/postprocessing/OutlinePass.js";
+import { FXAAShader } from "../lib/examples/jsm/shaders/FXAAShader.js";
 
 //Variables estandar
 let renderer,
