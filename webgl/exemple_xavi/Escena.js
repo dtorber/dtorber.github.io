@@ -82,9 +82,12 @@ pointLight.shadow.camera.far = 10000;
 //enxufar totes les llums
 earth["mesh"].castShadow = true;
 moon["mesh"].castShadow = true;
-sun.castShadow = true;
+earth["obj"].castShadow = true;
+moon["obj"].castShadow = true;
 earth["mesh"].receiveShadow = true;
 moon["mesh"].receiveShadow = true;
+earth["obj"].receiveShadow = true;
+moon["obj"].receiveShadow = true;
 sun.receiveShadow = true;
 
 sun.add(pointLight);

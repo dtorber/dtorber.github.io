@@ -83,8 +83,10 @@ export default class Planeta {
         });
       }
       this.mesh = new THREE.Mesh(geometria, material);
-      this.mesh.castShadow = true;
-      this.mesh.receiveShadow = true;
+      if (this.nom !== "Sol") {
+        this.mesh.castShadow = true;
+        this.mesh.receiveShadow = true;
+      }
       this.mesh.position.set(this.posX, this.posY, this.posZ);
       if (this.nom === "Sol") {
         this.mesh.rotateX(Math.PI);

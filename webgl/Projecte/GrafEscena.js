@@ -41,6 +41,10 @@ export default class GrafEscena {
         );
         const objecte = new THREE.Object3D();
         objecte.add(planeta.getMesh(loader, outline));
+        if (nom_planeta !== "Sol") {
+          objecte.castShadow = true;
+          objecte.receiveShadow = true;
+        }
         objecte.name = nom_planeta;
         if (nom_planeta === "Terra") {
           const lluna = new Planeta(

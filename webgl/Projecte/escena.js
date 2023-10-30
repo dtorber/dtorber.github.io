@@ -74,7 +74,7 @@ function crearRenderer() {
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setClearColor(0xaaaaaa);
   renderer.autoClear = false;
-  // renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = true;
   document.getElementById("container").appendChild(renderer.domElement);
 }
 
@@ -137,26 +137,6 @@ function crearLlums() {
   plight.shadow.camera.top = 500;
   plight.shadow.camera.bottom = -500;
   plight.shadow.camera.far = 10000;
-
-  // const sunLight = new THREE.DirectionalLight(0xffffff, 1);
-  // sunLight.position.set(0, 0, 0); // Coloca la luz en el origen (simulando el sol)
-  // sunLight.target.position.set(0, 1, 0); // Establece el objetivo de la luz (apuntando hacia abajo)
-  // sunLight.shadow.camera.left = -500;
-  // sunLight.shadow.camera.right = 500;
-  // sunLight.shadow.camera.top = 500;
-  // sunLight.shadow.camera.bottom = -500;
-  // sunLight.shadow.camera.far = 10000;
-  // sunLight.castShadow = true;
-
-  // scene.traverse((node) => {
-  //   if (node.isMesh || node.type === "Object3D") {
-  //     node.castShadow = true;
-  //     node.receiveShadow = true;
-  //   }
-  // });
-
-  // const helper = new THREE.CameraHelper(plight.shadow.camera);
-  // scene.add(helper);
 }
 
 function afegirMusica() {
