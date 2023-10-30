@@ -201,10 +201,6 @@ function loadScene() {
     planetes = resposta["planetes"];
     scene.add(escena);
     if (musica) {
-      // afegirMusica().then(() => {
-      //   render();
-      //   aplicarMovimentsPlanetes();
-      // });
       afegirMusica();
       render();
       aplicarMovimentsPlanetes();

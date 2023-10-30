@@ -40,10 +40,13 @@ export default class GrafEscena {
           textures[nom_planeta + "Spec"]
         );
         const objecte = new THREE.Object3D();
-        objecte.add(planeta.getMesh(loader, outline));
+        const meshPlaneta = planeta.getMesh(loader, outline);
+        objecte.add(meshPlaneta);
         if (nom_planeta !== "Sol") {
           objecte.castShadow = true;
           objecte.receiveShadow = true;
+          meshPlaneta.castShadow = true;
+          meshPlaneta.receiveShadow = true;
         }
         objecte.name = nom_planeta;
         if (nom_planeta === "Terra") {

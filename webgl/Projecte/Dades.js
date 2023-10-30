@@ -18,18 +18,6 @@ const nom_planetes = [
   "Neptú",
 ];
 
-//Distancies de cada planeta al sol (en unitats astronòmiques: la Terra té distància 1)
-// const distancies = {
-//   Sol: 0,
-//   Mercuri: 0.39 + 10,
-//   Venus: 0.72 + 13,
-//   Terra: 1 + 16,
-//   Marte: 1.52 + 18,
-//   Jupiter: 5.2 + 20,
-//   Saturn: 9.54 + 20,
-//   Urà: 19.2 + 15,
-//   Neptú: 30.06 + 15,
-// };
 const distancies = {
   Sol: 0,
   Mercuri: 1.0,
@@ -43,18 +31,6 @@ const distancies = {
   Lluna: 15, //distancia de la lluna a la terra
 };
 
-//Proporció de radis de cada planeta en funció de la Terra, com les distàncies al sol
-// const radis = {
-//   Sol: 109.08 / 2,
-//   Mercuri: 0.38 + 3,
-//   Venus: 0.95 + 3,
-//   Terra: 1.0 + 4,
-//   Marte: 0.53 + 3,
-//   Jupiter: 11.21,
-//   Saturn: 9.45,
-//   Urà: 4.01,
-//   Neptú: 3.88,
-// };
 const radis = {
   Sol: 109.08 / 2,
   Mercuri: 0.38 * 16,
